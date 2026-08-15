@@ -21,7 +21,11 @@ export default async function Home() {
   if (host.endsWith("mybluefinancial.com")) return <IssuerConsole />;
 
   const hostname = host.split(":")[0];
-  if (hostname === "myblueclues.com" || hostname.endsWith(".myblueclues.com")) return <CustomerWallet />;
+  if (
+    hostname === "myblueclues.com" ||
+    hostname.endsWith(".myblueclues.com") ||
+    hostname === "wallet.mybluecollar.dev"
+  ) return <CustomerWallet />;
   const isMyBlueWork =
     hostname === "mybluework.com" || hostname.endsWith(".mybluework.com");
   const headline =
