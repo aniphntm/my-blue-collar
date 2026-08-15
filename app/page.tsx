@@ -4,6 +4,7 @@ import { FeaturesSection } from "@/components/features-section";
 import { Footer } from "@/components/footer";
 import { FutureVision } from "@/components/future-vision";
 import { Hero } from "@/components/hero";
+import { IssuerConsole } from "@/components/issuer-console";
 import { Join } from "@/components/join";
 import { Nav } from "@/components/nav";
 import { PlatformWorkflow } from "@/components/platform-workflow";
@@ -16,6 +17,7 @@ import { headers } from "next/headers";
 export default async function Home() {
   const host = (await headers()).get("host") ?? "";
   if (host.startsWith("wallet.mybluefinancial.com")) return <CustomerWallet />;
+  if (host.endsWith("mybluefinancial.com")) return <IssuerConsole />;
 
   return <LandingPage />;
 }
