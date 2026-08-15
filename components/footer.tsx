@@ -12,7 +12,7 @@ export function Footer() {
         <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <span className="text-[15px] font-semibold tracking-tight">
-              MyBlueCollar
+              MyBlueTrade
             </span>
             <p className="mt-1.5 text-[13px] text-mut">
               Software for the trades
@@ -32,7 +32,7 @@ export function Footer() {
         </div>
 
         <p className="mt-12 border-t border-border pt-6 text-[13px] text-faint">
-          © 2026 MyBlueCollar — leads in, jobs out, paid on time.
+          © 2026 MyBlueTrade — jobs done, paid on time.
         </p>
       </div>
     </footer>

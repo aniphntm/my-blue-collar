@@ -11,11 +11,11 @@ export function Hero() {
           </div>
 
           <h1 className="mt-8 text-6xl leading-[0.98] font-medium tracking-[-0.022em] text-balance sm:text-7xl">
-            Leads.
-            <br />
             Jobs.
             <br />
             Paid.
+            <br />
+            Repeat.
           </h1>
 
           <p className="mt-8 max-w-lg text-lg leading-relaxed text-ink-3 text-pretty">

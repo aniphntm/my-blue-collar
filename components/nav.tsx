@@ -10,7 +10,7 @@ export function Nav() {
     <nav className="sticky top-0 z-50 border-b border-border-soft bg-nav-bg backdrop-blur-md">
       <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-6 px-6">
         <a href="#top" className="flex items-baseline gap-2 tracking-tight">
-          <span className="text-[15px] font-semibold">MyBlueCollar</span>
+          <span className="text-[15px] font-semibold">MyBlueTrade</span>
           <span className="font-mono text-[11px] text-faint">|</span>
           <span className="eyebrow text-mut">Trades</span>
         </a>
