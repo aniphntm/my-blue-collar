@@ -18,6 +18,10 @@ The customer should be able to answer three questions in seconds:
 - Crypto is an internal backing mechanism. It becomes visible only when it materially changes a customer's available amount or when the customer asks how their limit works.
 - Every surface is testnet-only until the financial program, custody, compliance, and card-issuing rails are in place.
 
+### Testnet asset scope
+
+The first test build supports **ETH only** on Ethereum Sepolia. Do not add USDC, token selection, swaps, or price conversion in this phase. Customers see their test ETH balance only after connecting their own browser wallet; no seed phrases are ever requested.
+
 ## Information architecture
 
 Use three primary tabs. Avoid a fourth tab until there is a proven customer need.
