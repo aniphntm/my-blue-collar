@@ -24,8 +24,11 @@ export default async function Home() {
   if (hostname === "myblueclues.com" || hostname.endsWith(".myblueclues.com")) return <CustomerWallet />;
   const headline =
     hostname === "mybluetrade.com" || hostname.endsWith(".mybluetrade.com")
-      ? "Get paid."
-      : "Get jobs.";
+      ? "Get jobs.\nGet paid.\nRepeat."
+      : hostname === "mybluetrades.com" ||
+          hostname.endsWith(".mybluetrades.com")
+        ? "Jobs.\nPaid.\nRepeat."
+        : "Get jobs.";
 
   return <LandingPage headline={headline} />;
 }

@@ -14,7 +14,7 @@ export function Hero({ headline }: HeroProps) {
             <span className="eyebrow">Free beta — waitlist open</span>
           </div>
 
-          <h1 className="mt-8 text-6xl leading-[0.98] font-medium tracking-[-0.022em] text-balance sm:text-7xl">
+          <h1 className="mt-8 whitespace-pre-line text-6xl leading-[0.98] font-medium tracking-[-0.022em] text-balance sm:text-7xl">
             {headline}
           </h1>
 
