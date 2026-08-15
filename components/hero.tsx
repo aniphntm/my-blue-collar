@@ -2,9 +2,10 @@ import { heroFlow } from "@/lib/content";
 
 type HeroProps = {
   headline: string;
+  lede?: string;
 };
 
-export function Hero({ headline }: HeroProps) {
+export function Hero({ headline, lede }: HeroProps) {
   return (
     <header id="top" className="paper-grid border-b border-border-soft">
       <div className="mx-auto grid w-full max-w-6xl gap-16 px-6 pt-20 pb-24 lg:grid-cols-[1fr_400px] lg:items-start lg:gap-20">
@@ -19,9 +20,13 @@ export function Hero({ headline }: HeroProps) {
           </h1>
 
           <p className="mt-8 max-w-lg text-lg leading-relaxed text-ink-3 text-pretty">
-            One place to run the trade — find the work, do the work, get paid
-            for it. Built for electricians, plumbers, HVAC, roofers, and
-            everyone in between.
+            {lede ?? (
+              <>
+                One place to run the trade — find the work, do the work, get
+                paid for it. Built for electricians, plumbers, HVAC, roofers,
+                and everyone in between.
+              </>
+            )}
           </p>
 
           <div className="mt-10 flex flex-wrap items-center gap-5">

@@ -22,26 +22,37 @@ export default async function Home() {
 
   const hostname = host.split(":")[0];
   if (hostname === "myblueclues.com" || hostname.endsWith(".myblueclues.com")) return <CustomerWallet />;
+  const isMyBlueWork =
+    hostname === "mybluework.com" || hostname.endsWith(".mybluework.com");
   const headline =
     hostname === "mybluetrade.com" ||
-    hostname.endsWith(".mybluetrade.com") ||
-    hostname === "mybluework.com" ||
-    hostname.endsWith(".mybluework.com")
+    hostname.endsWith(".mybluetrade.com")
       ? "Get jobs.\nGet paid.\nRepeat."
       : hostname === "mybluetrades.com" ||
           hostname.endsWith(".mybluetrades.com")
         ? "Jobs.\nPaid.\nRepeat."
-        : "Get jobs.";
+        : isMyBlueWork
+          ? "Every job has\none thread."
+          : "Get jobs.";
+  const heroLede = isMyBlueWork
+    ? "Every message, photo, estimate, invoice, and payment stays with the job—from first call to paid."
+    : undefined;
 
-  return <LandingPage headline={headline} />;
+  return <LandingPage headline={headline} heroLede={heroLede} />;
 }
 
-function LandingPage({ headline }: { headline: string }) {
+function LandingPage({
+  headline,
+  heroLede,
+}: {
+  headline: string;
+  heroLede?: string;
+}) {
   return (
     <>
       <Nav />
       <main>
-        <Hero headline={headline} />
+        <Hero headline={headline} lede={heroLede} />
         <TradesStrip />
         <Problems />
         <Estimations />
