@@ -1,4 +1,3 @@
-import { CustomerWallet } from "@/components/customer-wallet";
 import { Faq } from "@/components/faq";
 import { FeaturesSection } from "@/components/features-section";
 import { Footer } from "@/components/footer";
@@ -16,7 +15,6 @@ import { headers } from "next/headers";
 
 export default async function Home() {
   const host = (await headers()).get("host") ?? "";
-  if (host.startsWith("wallet.mybluefinancial.com")) return <CustomerWallet />;
   if (host.endsWith("mybluefinancial.com")) return <IssuerConsole />;
 
   return <LandingPage />;
