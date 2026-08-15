@@ -1,5 +1,6 @@
 import { Faq } from "@/components/faq";
 import { CustomerWallet } from "@/components/customer-wallet";
+import { Estimations } from "@/components/estimations";
 import { FeaturesSection } from "@/components/features-section";
 import { Footer } from "@/components/footer";
 import { FutureVision } from "@/components/future-vision";
@@ -37,6 +38,7 @@ function LandingPage({ headline }: { headline: string }) {
         <Hero headline={headline} />
         <TradesStrip />
         <Problems />
+        <Estimations />
         <JobThreads />
         <PlatformWorkflow />
         <FeaturesSection />
