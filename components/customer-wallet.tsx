@@ -1,9 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePlaidLink } from "react-plaid-link";
 
 type WalletTab = "Wallet" | "Activity" | "Network";
 type SendStep = "address" | "amount" | "review" | "handoff";
+type BankState = "idle" | "opening" | "connected" | "error";
+type DisplayPreference = "Cents" | "Rupees" | "Dollars" | "Euros";
 
 const walletAddress = "0x71C2A9F412e6B803C5d40D72E4B4A9aBc2687E31";
 
@@ -13,11 +16,17 @@ const transactions = [
   { id: 3, label: "Received", date: "Aug 12 · 09:05", amount: "+0.1000 ETH", fee: "Paid by sender", glyph: "↙", status: "Confirmed", hash: "0x42bc…07ef" },
 ];
 
+const displayPreferences: DisplayPreference[] = ["Cents", "Rupees", "Dollars", "Euros"];
+
 export function CustomerWallet() {
   const [tab, setTab] = useState<WalletTab>("Wallet");
   const [sendOpen, setSendOpen] = useState(false);
   const [receiveOpen, setReceiveOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [linkToken, setLinkToken] = useState<string | null>(null);
+  const [bankState, setBankState] = useState<BankState>("idle");
+  const [bankMessage, setBankMessage] = useState("No deposit is necessary.");
+  const [displayPreference, setDisplayPreference] = useState<DisplayPreference>("Dollars");
 
   const copyAddress = async () => {
     await navigator.clipboard.writeText(walletAddress);
@@ -25,8 +34,23 @@ export function CustomerWallet() {
     window.setTimeout(() => setCopied(false), 1600);
   };
 
+  const connectBank = async () => {
+    setBankState("opening");
+    setBankMessage("Preparing secure bank sign-in…");
+    try {
+      const response = await fetch("/api/plaid/link-token", { method: "POST" });
+      const data = (await response.json()) as { linkToken?: string; error?: string };
+      if (!response.ok || !data.linkToken) throw new Error(data.error ?? "Bank sign-in is unavailable right now.");
+      setLinkToken(data.linkToken);
+    } catch (error) {
+      setBankState("error");
+      setBankMessage(error instanceof Error ? error.message : "Bank sign-in is unavailable right now.");
+    }
+  };
+
   return (
     <main className="min-h-screen bg-[#f7f8fb] font-sans text-[#151923]">
+      {linkToken ? <PlaidLinkLauncher linkToken={linkToken} onConnected={() => { setLinkToken(null); setBankState("connected"); setBankMessage("Your bank is connected."); }} onExit={() => { setLinkToken(null); if (bankState === "opening") { setBankState("idle"); setBankMessage("No deposit is necessary."); } }} onError={(message) => { setLinkToken(null); setBankState("error"); setBankMessage(message); }} /> : null}
       <div className="flex min-h-screen">
         <aside className="hidden w-[76px] shrink-0 flex-col items-center border-r border-[#e4e7ec] bg-white py-5 sm:flex">
           <div className="mb-6 grid size-9 place-items-center rounded-[10px] bg-[#3457f1] text-base font-extrabold text-white">B</div>
@@ -49,7 +73,7 @@ export function CustomerWallet() {
           </header>
           <div className="flex items-center gap-2 border-b border-[#f5e6b8] bg-[#fff4db] px-5 py-2 text-xs font-semibold text-[#a36100] sm:px-7"><span className="size-1.5 rounded-full bg-[#a36100]" />Testnet · No real funds — Ethereum Sepolia only</div>
           <div className="mx-auto max-w-[760px] p-5 pb-24 sm:p-7 sm:pb-8">
-            {tab === "Wallet" ? <WalletHome onCopy={copyAddress} onReceive={() => setReceiveOpen(true)} onSend={() => setSendOpen(true)} /> : null}
+            {tab === "Wallet" ? <WalletHome onCopy={copyAddress} onReceive={() => setReceiveOpen(true)} onSend={() => setSendOpen(true)} onConnectBank={connectBank} bankState={bankState} bankMessage={bankMessage} displayPreference={displayPreference} setDisplayPreference={setDisplayPreference} /> : null}
             {tab === "Activity" ? <Activity /> : null}
             {tab === "Network" ? <NetworkEconomics /> : null}
           </div>
@@ -64,7 +88,7 @@ export function CustomerWallet() {
   );
 }
 
-function WalletHome({ onCopy, onReceive, onSend }: { onCopy: () => void; onReceive: () => void; onSend: () => void }) {
+function WalletHome({ onCopy, onReceive, onSend, onConnectBank, bankState, bankMessage, displayPreference, setDisplayPreference }: { onCopy: () => void; onReceive: () => void; onSend: () => void; onConnectBank: () => void; bankState: BankState; bankMessage: string; displayPreference: DisplayPreference; setDisplayPreference: (preference: DisplayPreference) => void }) {
   const actions = [{ label: "Send", glyph: "↗", action: onSend }, { label: "Receive", glyph: "↙", action: onReceive }, { label: "Copy", glyph: "⧉", action: onCopy }];
   return <div className="space-y-6">
     <section className="overflow-hidden rounded-[20px] bg-[#171b28] p-7 text-white sm:p-8">
@@ -72,7 +96,9 @@ function WalletHome({ onCopy, onReceive, onSend }: { onCopy: () => void; onRecei
       <div className="mt-5 flex items-baseline gap-2"><span className="font-mono text-5xl font-semibold tracking-[-.04em] sm:text-[52px]">0.1375</span><span className="text-lg font-semibold text-[#9aa4bf]">ETH</span></div>
       <p className="mt-2 font-mono text-xs text-[#9aa4bf]">0x71C2…7E31</p>
       <div className="mt-8 grid max-w-sm grid-cols-3 gap-3">{actions.map((item) => <button key={item.label} onClick={item.action} className="group flex flex-col items-center gap-2 text-xs font-semibold"><span className="grid size-12 place-items-center rounded-full bg-white/[.08] text-lg transition group-hover:bg-white/[.16]">{item.glyph}</span>{item.label}</button>)}</div>
+      <div className="mt-7 flex flex-wrap gap-2 border-t border-white/10 pt-4">{displayPreferences.map((preference) => <button key={preference} onClick={() => setDisplayPreference(preference)} className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${displayPreference === preference ? "bg-white text-[#171b28]" : "bg-white/[.08] text-[#c8d0df] hover:bg-white/[.16]"}`}>{preference}</button>)}</div>
     </section>
+    <section className="rounded-[14px] border border-[#e4e7ec] bg-white p-4 sm:p-5"><div className="flex flex-wrap items-center justify-between gap-4"><div><p className="text-sm font-semibold">Connect a bank</p><p className="mt-1 text-xs text-[#667085]">{bankMessage}</p></div><button onClick={onConnectBank} disabled={bankState === "opening" || bankState === "connected"} className="rounded-lg bg-[#3457f1] px-4 py-2.5 text-sm font-bold text-white disabled:cursor-wait disabled:opacity-70">{bankState === "opening" ? "Opening…" : bankState === "connected" ? "Bank connected" : "Connect a bank"}</button></div><p className="mt-3 text-[11px] text-[#7b8495]">Your {displayPreference.toLowerCase()} preference is display-only and does not change this wallet’s ETH balance.</p></section>
     <section><p className="mb-2 text-xs font-bold uppercase tracking-[.06em] text-[#7b8495]">Asset</p><div className="flex items-center gap-3 rounded-[14px] border border-[#e4e7ec] bg-white p-4"><span className="grid size-10 place-items-center rounded-full bg-[#eef1ff] font-mono font-bold text-[#3457f1]">Ξ</span><div className="flex-1"><p className="text-sm font-semibold">Ethereum</p><p className="mt-0.5 text-xs text-[#7b8495]">Sepolia · Test network</p></div><div className="text-right"><p className="font-mono text-sm font-semibold">0.1375 ETH</p><p className="mt-0.5 text-[11px] font-semibold text-[#a36100]">No market value</p></div></div></section>
     <section><div className="mb-2 flex items-center justify-between"><p className="text-xs font-bold uppercase tracking-[.06em] text-[#7b8495]">Recent activity</p><span className="text-xs font-semibold text-[#3457f1]">Last 30 days</span></div><TransactionList items={transactions.slice(0, 2)} /></section>
   </div>;
@@ -122,4 +148,25 @@ function ReviewRow({ label, value, mono = false }: { label: string; value: strin
 
 function ReceiveDialog({ copied, onClose, onCopy }: { copied: boolean; onClose: () => void; onCopy: () => void }) {
   return <div className="fixed inset-0 z-50 grid place-items-center bg-[#151923]/70 p-5" role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) onClose(); }}><section role="dialog" aria-modal="true" aria-labelledby="receive-title" className="w-full max-w-[400px] rounded-[18px] bg-white p-6 text-center shadow-2xl"><button onClick={onClose} aria-label="Close" className="ml-auto grid size-8 place-items-center rounded-full text-[#7b8495] hover:bg-[#f2f4f7]">×</button><div className="mx-auto grid size-20 place-items-center rounded-2xl bg-[#eef1ff] font-mono text-3xl font-bold text-[#3457f1]">Ξ</div><h2 id="receive-title" className="mt-5 font-bold">Receive test ETH</h2><p className="mt-2 text-xs leading-5 text-[#667085]">Only send assets supported on Ethereum Sepolia to this address.</p><button onClick={onCopy} className="mt-5 w-full break-all rounded-lg border border-[#d0d5dd] bg-[#f7f8fb] p-3 font-mono text-xs leading-5">{walletAddress}</button><button onClick={onCopy} className="mt-3 w-full rounded-lg bg-[#3457f1] px-4 py-2.5 text-sm font-bold text-white">{copied ? "Address copied" : "Copy address"}</button></section></div>;
+}
+
+function PlaidLinkLauncher({ linkToken, onConnected, onExit, onError }: { linkToken: string; onConnected: () => void; onExit: () => void; onError: (message: string) => void }) {
+  const opened = useRef(false);
+  const onSuccess = useCallback(async (publicToken: string | null) => {
+    if (!publicToken) {
+      onError("Bank sign-in did not return a connection token. Please try again.");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/plaid/exchange", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ publicToken }) });
+      if (!response.ok) throw new Error();
+      onConnected();
+    } catch {
+      onError("Bank sign-in finished, but we could not save this connection.");
+    }
+  }, [onConnected, onError]);
+  const { open, ready } = usePlaidLink({ token: linkToken, onSuccess, onExit });
+  useEffect(() => { if (ready && !opened.current) { opened.current = true; open(); } }, [open, ready]);
+  return null;
 }
