@@ -1,4 +1,5 @@
 import { Faq } from "@/components/faq";
+import { CustomerWallet } from "@/components/customer-wallet";
 import { FeaturesSection } from "@/components/features-section";
 import { Footer } from "@/components/footer";
 import { FutureVision } from "@/components/future-vision";
@@ -19,6 +20,7 @@ export default async function Home() {
   if (host.endsWith("mybluefinancial.com")) return <IssuerConsole />;
 
   const hostname = host.split(":")[0];
+  if (hostname === "myblueclues.com" || hostname.endsWith(".myblueclues.com")) return <CustomerWallet />;
   const headline =
     hostname === "mybluetrade.com" || hostname.endsWith(".mybluetrade.com")
       ? "Get paid."
