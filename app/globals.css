@@ -1,26 +1,168 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ── Palette ────────────────────────────────────────────────────────────
+   Warm-paper light / warm-black dark. Every token is redefined under
+   prefers-color-scheme, and @theme inline emits var() references, so the
+   whole palette flips without a single dark: variant in the markup.        */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  --font-geist: Arial, Helvetica, sans-serif;
+  --font-geist-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --c-bg: #faf9f6;
+  --c-bg-alt: #f4f2ee;
+  --c-surface: #ffffff;
+
+  --c-border: #e5e2da;
+  --c-border-soft: #eceae3;
+  --c-border-mid: #dcd8cf;
+
+  --c-text: #14130e;
+  --c-text-2: #2a2823;
+  --c-text-3: #403d36;
+  --c-text-mut: #6b675f;
+  --c-text-faint: #757068;
+
+  --c-accent: #2563eb;
+  --c-accent-dark: #1e40af;
+  --c-on-accent: #ffffff;
+
+  --c-mark: #bcd7fb;
+  --c-on-mark: #14130e;
+
+  --c-panel: #1c1913;
+  --c-panel-2: #131109;
+  --c-panel-text: #e3ded6;
+  --c-panel-soft: #b8b2a8;
+  /* Lightened from Kagaz's #7d786e to clear 4.5:1 on the panel. */
+  --c-panel-faint: #938e83;
+  --c-panel-border: #ffffff1a;
+
+  --c-nav-bg: #faf9f6d1;
+  --c-grid: #14130e0b;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --c-bg: #131109;
+    --c-bg-alt: #191610;
+    --c-surface: #1c1913;
+
+    --c-border: #2c2921;
+    --c-border-soft: #262319;
+    --c-border-mid: #3a362c;
+
+    --c-text: #ebe7de;
+    --c-text-2: #ddd8ce;
+    --c-text-3: #c5c0b5;
+    --c-text-mut: #98938a;
+    --c-text-faint: #8a867d;
+
+    --c-accent: #7c8ef3;
+    --c-accent-dark: #8fa3f7;
+    --c-on-accent: #14100c;
+
+    --c-mark: #6d94f552;
+    --c-on-mark: #ebe7de;
+
+    --c-panel: #14100c;
+    --c-panel-2: #0c0906;
+
+    --c-nav-bg: #131109d1;
+    --c-grid: #ebe7de0b;
   }
 }
 
+@theme inline {
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo,
+    monospace;
+
+  --color-bg: var(--c-bg);
+  --color-bg-alt: var(--c-bg-alt);
+  --color-surface: var(--c-surface);
+
+  --color-border: var(--c-border);
+  --color-border-soft: var(--c-border-soft);
+  --color-border-mid: var(--c-border-mid);
+
+  --color-ink: var(--c-text);
+  --color-ink-2: var(--c-text-2);
+  --color-ink-3: var(--c-text-3);
+  --color-mut: var(--c-text-mut);
+  --color-faint: var(--c-text-faint);
+
+  --color-accent: var(--c-accent);
+  --color-accent-dark: var(--c-accent-dark);
+  --color-on-accent: var(--c-on-accent);
+
+  --color-mark: var(--c-mark);
+  --color-on-mark: var(--c-on-mark);
+
+  --color-panel: var(--c-panel);
+  --color-panel-2: var(--c-panel-2);
+  --color-panel-text: var(--c-panel-text);
+  --color-panel-soft: var(--c-panel-soft);
+  --color-panel-faint: var(--c-panel-faint);
+  --color-panel-border: var(--c-panel-border);
+
+  --color-nav-bg: var(--c-nav-bg);
+  --color-grid: var(--c-grid);
+
+  --radius-card: 8px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--c-bg);
+  color: var(--c-text);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.011em;
+}
+
+::selection {
+  background: var(--c-mark);
+  color: var(--c-on-mark);
+}
+
+/* Faint graph-paper wash — the "paper" the palette is named for. */
+.paper-grid {
+  background-image: linear-gradient(var(--c-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--c-grid) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+/* Mono eyebrow: uppercase, widely tracked, sits above every section head. */
+.eyebrow {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rule-line {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+input::placeholder,
+select:invalid {
+  color: var(--c-text-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
