@@ -23,7 +23,10 @@ export default async function Home() {
   const hostname = host.split(":")[0];
   if (hostname === "myblueclues.com" || hostname.endsWith(".myblueclues.com")) return <CustomerWallet />;
   const headline =
-    hostname === "mybluetrade.com" || hostname.endsWith(".mybluetrade.com")
+    hostname === "mybluetrade.com" ||
+    hostname.endsWith(".mybluetrade.com") ||
+    hostname === "mybluework.com" ||
+    hostname.endsWith(".mybluework.com")
       ? "Get jobs.\nGet paid.\nRepeat."
       : hostname === "mybluetrades.com" ||
           hostname.endsWith(".mybluetrades.com")
