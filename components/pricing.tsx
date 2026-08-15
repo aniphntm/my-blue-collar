@@ -6,7 +6,7 @@ export function Pricing() {
     <section id="pricing" className="border-b border-border-soft bg-bg-alt">
       <div className="mx-auto w-full max-w-6xl px-6 py-24">
         <SectionHead
-          index="04 — Pricing"
+          index="05 — Pricing"
           lede="The essentials are free and stay free. Paid tiers open after the beta, and beta members get preferred pricing."
         >
           Start free.

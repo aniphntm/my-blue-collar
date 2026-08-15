@@ -40,10 +40,10 @@ export const ruleCards: RuleCard[] = [
     rule: "RULE → the essentials never go behind a paywall",
   },
   {
-    eyebrow: "ONE THREAD · PER CUSTOMER",
+    eyebrow: "ONE THREAD · PER JOB",
     title: "Nothing falls through",
-    body: "Every call, photo, estimate, and invoice sits on one customer, in order. The job is the record.",
-    rule: "RULE → one customer, one thread, start to paid",
+    body: "Every call, text, photo, estimate, and invoice stays with the job, in order. The thread is the record.",
+    rule: "RULE → one job, one thread, start to paid",
   },
   {
     eyebrow: "YOURS · NOT OURS",
@@ -53,7 +53,73 @@ export const ruleCards: RuleCard[] = [
   },
 ];
 
-/* ── 02 — The flow, as a journey ─────────────────────────────────────── */
+/* ── 02 — One job, one thread ───────────────────────────────────────── */
+
+export type JobThread = {
+  job: string;
+  trade: string;
+  status: string;
+  crew: string;
+  activity: string;
+  tools: string[];
+  accent: string;
+  dot: string;
+};
+
+export const jobThreads: JobThread[] = [
+  {
+    job: "Carter kitchen",
+    trade: "Electrical",
+    status: "On site",
+    crew: "Mike + 2",
+    activity: "3 photos · permit attached",
+    tools: ["Gmail", "SMS", "QuickBooks"],
+    accent: "border-l-blue-500",
+    dot: "bg-blue-500",
+  },
+  {
+    job: "Park rooftop unit",
+    trade: "HVAC",
+    status: "Estimate sent",
+    crew: "Rosa",
+    activity: "Customer viewed 18m ago",
+    tools: ["Gmail", "QuickBooks"],
+    accent: "border-l-amber-500",
+    dot: "bg-amber-500",
+  },
+  {
+    job: "Northside service call",
+    trade: "Plumbing",
+    status: "Scheduled",
+    crew: "Truck 3",
+    activity: "Tomorrow · 8:30 AM",
+    tools: ["Calendar", "SMS"],
+    accent: "border-l-emerald-500",
+    dot: "bg-emerald-500",
+  },
+  {
+    job: "Mendez roof repair",
+    trade: "Roofing",
+    status: "Waiting on parts",
+    crew: "Dale + 3",
+    activity: "Supplier replied today",
+    tools: ["Gmail", "Files"],
+    accent: "border-l-violet-500",
+    dot: "bg-violet-500",
+  },
+  {
+    job: "Wilson panel upgrade",
+    trade: "Electrical",
+    status: "Ready to invoice",
+    crew: "Mike",
+    activity: "Time + materials approved",
+    tools: ["SMS", "QuickBooks"],
+    accent: "border-l-rose-500",
+    dot: "bg-rose-500",
+  },
+];
+
+/* ── 03 — The flow, as a journey ─────────────────────────────────────── */
 
 export type JourneyStep = {
   n: string;

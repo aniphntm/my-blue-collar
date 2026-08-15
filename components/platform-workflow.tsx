@@ -5,7 +5,7 @@ export function PlatformWorkflow() {
   return (
     <section id="flow" className="border-b border-border-soft bg-bg-alt">
       <div className="mx-auto w-full max-w-6xl px-6 py-24">
-        <SectionHead index="02 — The flow, as a journey">
+        <SectionHead index="03 — The flow, as a journey">
           A day you can see,
           <br />
           not decipher.

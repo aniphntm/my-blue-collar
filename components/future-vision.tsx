@@ -5,7 +5,7 @@ export function FutureVision() {
   return (
     <section className="border-b border-border-soft">
       <div className="mx-auto w-full max-w-6xl px-6 py-24">
-        <SectionHead index="03 — Who's on the tools">
+        <SectionHead index="04 — Who's on the tools">
           Built for people
           <br />
           like you.

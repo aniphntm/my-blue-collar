@@ -1,6 +1,10 @@
 import { heroFlow } from "@/lib/content";
 
-export function Hero() {
+type HeroProps = {
+  headline: string;
+};
+
+export function Hero({ headline }: HeroProps) {
   return (
     <header id="top" className="paper-grid border-b border-border-soft">
       <div className="mx-auto grid w-full max-w-6xl gap-16 px-6 pt-20 pb-24 lg:grid-cols-[1fr_400px] lg:items-start lg:gap-20">
@@ -11,11 +15,7 @@ export function Hero() {
           </div>
 
           <h1 className="mt-8 text-6xl leading-[0.98] font-medium tracking-[-0.022em] text-balance sm:text-7xl">
-            Jobs.
-            <br />
-            Paid.
-            <br />
-            Repeat.
+            {headline}
           </h1>
 
           <p className="mt-8 max-w-lg text-lg leading-relaxed text-ink-3 text-pretty">

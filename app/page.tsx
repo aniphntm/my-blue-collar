@@ -4,6 +4,7 @@ import { Footer } from "@/components/footer";
 import { FutureVision } from "@/components/future-vision";
 import { Hero } from "@/components/hero";
 import { IssuerConsole } from "@/components/issuer-console";
+import { JobThreads } from "@/components/job-threads";
 import { Join } from "@/components/join";
 import { Nav } from "@/components/nav";
 import { PlatformWorkflow } from "@/components/platform-workflow";
@@ -17,17 +18,24 @@ export default async function Home() {
   const host = (await headers()).get("host") ?? "";
   if (host.endsWith("mybluefinancial.com")) return <IssuerConsole />;
 
-  return <LandingPage />;
+  const hostname = host.split(":")[0];
+  const headline =
+    hostname === "mybluetrade.com" || hostname.endsWith(".mybluetrade.com")
+      ? "Get paid."
+      : "Get jobs.";
+
+  return <LandingPage headline={headline} />;
 }
 
-function LandingPage() {
+function LandingPage({ headline }: { headline: string }) {
   return (
     <>
       <Nav />
       <main>
-        <Hero />
+        <Hero headline={headline} />
         <TradesStrip />
         <Problems />
+        <JobThreads />
         <PlatformWorkflow />
         <FeaturesSection />
         <FutureVision />
