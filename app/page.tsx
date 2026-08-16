@@ -15,12 +15,14 @@ import { Problems } from "@/components/problems";
 import { TradesStrip } from "@/components/trades-strip";
 import { WhyFree } from "@/components/why-free";
 import { headers } from "next/headers";
+import { AnjaliVideo } from "@/components/anjali-video";
 
 export default async function Home() {
   const host = (await headers()).get("host") ?? "";
   if (host.endsWith("mybluefinancial.com")) return <IssuerConsole />;
 
   const hostname = host.split(":")[0];
+  if (hostname === "anjali.mybluetrade.com") return <AnjaliVideo />;
   if (
     hostname === "myblueclues.com" ||
     hostname.endsWith(".myblueclues.com") ||
