@@ -1,5 +1,11 @@
 import { CustomerWallet } from "@/components/customer-wallet";
+import { WalletConnectBeta } from "@/components/wallet-connect-beta";
 
 export default function WalletPage() {
-  return <CustomerWallet />;
+  return (
+    <>
+      <WalletConnectBeta />
+      <CustomerWallet />
+    </>
+  );
 }
