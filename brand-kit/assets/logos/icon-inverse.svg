@@ -1,0 +1,18 @@
+<!-- Blue lowercase mb workmark: a compact, high-contrast replacement for the stock Vercel favicon. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="MyBlueTrade">
+  <defs>
+    <linearGradient id="blue" x1="8" y1="4" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3B82F6" />
+      <stop offset="1" stop-color="#1D4ED8" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#fff" />
+  <path
+    d="M10 45V29m0 5c2-7 11-7 11 1v10m0-10c1-8 12-8 12 0v10m8-27v27m0-10c2-8 13-8 13 2v1c0 10-13 10-13 1"
+    fill="none"
+    stroke="url(#blue)"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="5.5"
+  />
+</svg>
