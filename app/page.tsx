@@ -44,15 +44,26 @@ export default async function Home() {
     ? "Every message, photo, estimate, invoice, and payment stays with the job—from first call to paid."
     : undefined;
 
-  return <LandingPage headline={headline} heroLede={heroLede} />;
+  const showMyBlueCoin =
+    hostname === "myblueinc.com" || hostname === "www.myblueinc.com";
+
+  return (
+    <LandingPage
+      headline={headline}
+      heroLede={heroLede}
+      showMyBlueCoin={showMyBlueCoin}
+    />
+  );
 }
 
 function LandingPage({
   headline,
   heroLede,
+  showMyBlueCoin,
 }: {
   headline: string;
   heroLede?: string;
+  showMyBlueCoin: boolean;
 }) {
   return (
     <>
@@ -67,6 +78,32 @@ function LandingPage({
         <FeaturesSection />
         <FutureVision />
         <WhyFree />
+        {showMyBlueCoin && (
+          <section
+            id="mybluecoin"
+            aria-labelledby="mybluecoin-heading"
+            className="border-b border-border-soft"
+          >
+            <div className="mx-auto w-full max-w-6xl px-6 py-16 sm:py-20">
+              <span className="eyebrow text-faint">Coming soon</span>
+              <h2
+                id="mybluecoin-heading"
+                className="mt-5 text-3xl font-medium tracking-[-0.02em] sm:text-4xl"
+              >
+                MyBlueCoin <span className="text-accent">$BLUE</span>
+              </h2>
+              <p className="mt-6 max-w-3xl text-lg leading-relaxed text-ink-3">
+                MyBlueCoin ($BLUE) is our upcoming token, with a vision to
+                support the DeFi rails behind MyBlueFinancial and MyBlueTrades as
+                we build toward cards, payments, and savings.
+              </p>
+              <p className="mt-4 max-w-3xl text-lg leading-relaxed text-ink-3">
+                Our ambition: grow with our community, stay independent of VC
+                funding, and keep building for working people. No Hollywood.
+              </p>
+            </div>
+          </section>
+        )}
         <Pricing />
         <Join />
         <Faq />
