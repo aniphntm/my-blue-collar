@@ -33,12 +33,12 @@ export default async function Home() {
   const headline =
     hostname === "mybluetrade.com" ||
     hostname.endsWith(".mybluetrade.com")
-      ? "Get jobs.\nGet paid.\nRepeat."
+      ? "Get jobs.\\nGet paid.\\nRepeat."
       : hostname === "mybluetrades.com" ||
           hostname.endsWith(".mybluetrades.com")
-        ? "Jobs.\nPaid.\nRepeat."
+        ? "Jobs.\\nPaid.\\nRepeat."
         : isMyBlueWork
-          ? "Every job has\none thread."
+          ? "Every job has\\none thread."
           : "Get jobs.";
   const heroLede = isMyBlueWork
     ? "Every message, photo, estimate, invoice, and payment stays with the job—from first call to paid."
@@ -70,7 +70,7 @@ function LandingPage({
 }) {
   return (
     <>
-      <Nav />
+      <Nav showMyBlueCoin={showMyBlueCoin} />
       <main>
         <Hero headline={headline} lede={heroLede} />
         <TradesStrip />
