@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { supabase } from "@/lib/supabase";
 
 const fieldClasses =
   "w-full rounded-card border border-border bg-surface px-3.5 py-2.5 text-[14px] outline-none transition-colors focus:border-accent";
@@ -19,7 +18,9 @@ export function WaitlistForm() {
     setStatus("submitting");
 
     const formData = new FormData(event.currentTarget);
-    const { error } = await supabase.from("leads").insert({
+    try {
+      const { supabase } = await import("@/lib/supabase");
+      const { error } = await supabase.from("leads").insert({
       name: formData.get("name"),
       business: formData.get("business"),
       email: formData.get("email"),
@@ -37,6 +38,9 @@ export function WaitlistForm() {
     } else if (error.code === UNIQUE_VIOLATION) {
       setStatus("duplicate");
     } else {
+      setStatus("error");
+    }
+    } catch {
       setStatus("error");
     }
   }
