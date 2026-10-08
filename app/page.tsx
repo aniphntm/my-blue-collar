@@ -45,7 +45,10 @@ export default async function Home() {
     : undefined;
 
   const showMyBlueCoin =
-    hostname === "myblueinc.com" || hostname === "www.myblueinc.com";
+    hostname === "myblueinc.com" ||
+    hostname === "www.myblueinc.com" ||
+    hostname === "myblueinc.vercel.app" ||
+    (hostname.startsWith("myblueinc-") && hostname.endsWith("-myblue.vercel.app"));
 
   return (
     <LandingPage
