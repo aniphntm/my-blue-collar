@@ -5,7 +5,7 @@ const links = [
   { href: "#faq", label: "FAQ" },
 ];
 
-export function Nav() {
+export function Nav({ showMyBlueCoin = false }: { showMyBlueCoin?: boolean }) {
   return (
     <nav className="sticky top-0 z-50 border-b border-border-soft bg-nav-bg backdrop-blur-md">
       <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-6 px-6">
@@ -27,9 +27,18 @@ export function Nav() {
           ))}
         </div>
 
+        {showMyBlueCoin && (
+          <a
+            href="#mybluecoin"
+            className="ml-auto rounded-card bg-accent px-3.5 py-1.5 text-[13px] font-semibold text-on-accent transition-colors hover:bg-accent-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:ml-0"
+          >
+            $BLUE <span aria-hidden="true">↗</span>
+          </a>
+        )}
+
         <a
           href="#join"
-          className="ml-auto rounded-card border border-border-mid px-3.5 py-1.5 text-[13px] font-medium transition-colors hover:border-ink sm:ml-0"
+          className={`rounded-card border border-border-mid px-3.5 py-1.5 text-[13px] font-medium transition-colors hover:border-ink ${showMyBlueCoin ? "" : "ml-auto"} sm:ml-0`}
         >
           Join <span className="text-faint">→</span>
         </a>
