@@ -1,0 +1,28 @@
+{
+  "name": "myblue-funnel-release",
+  "version": "1.0.0",
+  "description": "",
+  "main": "funnel.js",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@privy-io/react-auth": "^3.49.1",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "jose": "^6.2.12",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.4"
+  },
+  "private": true
+}
