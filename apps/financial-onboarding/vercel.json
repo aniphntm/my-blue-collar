@@ -6,42 +6,11 @@
       "dest": "/api/$1"
     },
     {
-      "src": "/",
-      "has": [
-        {
-          "type": "host",
-          "value": "onboard.mybluefinancial.com"
-        }
-      ],
-      "dest": "/onboard.html"
-    },
-    {
-      "src": "/login/?",
-      "dest": "/login.html"
-    },
-    {
-      "src": "/(?:create|signup|register)/?",
-      "dest": "/create.html"
-    },
-    {
-      "src": "/onboard/?",
-      "status": 307,
-      "headers": {
-        "Location": "https://onboard.mybluefinancial.com/"
-      }
+      "src": "/(?:wallet|login|create|signup|register|onboard)/?",
+      "dest": "/wallet.html"
     },
     {
       "handle": "filesystem"
-    },
-    {
-      "src": "/.*",
-      "has": [
-        {
-          "type": "host",
-          "value": "onboard.mybluefinancial.com"
-        }
-      ],
-      "dest": "/onboard.html"
     },
     {
       "src": "/.*",

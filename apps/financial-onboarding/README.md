@@ -1,49 +1,72 @@
-# MyBlue Financial funnel
+# MyBlue Financial onboarding — wallet authentication, funding paused
 
-Production source for the Financial static landing, Privy React login/account setup, and verified onboarding session handoff.
+This standalone Vite application lives in `apps/financial-onboarding`. The repository root is a separate application. Changes here retire Privy only from Financial onboarding; they make no statement about other MyBlue apps.
 
-- `https://mybluework.com/coin` proxies the Financial landing through a host-scoped Vercel project route. `/coin/*` includes images and manifesto assets.
-- Login and create entrypoints live at `https://mybluefinancial.com/login` and `/create?provider=coinbase|robinhood|walletconnect`.
-- Privy authenticates through email or an external wallet. Embedded EVM wallets are created only after an explicit user action; existing embedded wallets are reused. No transactions or delegated signers are requested.
-- Coinbase has a configuration-gated funding backend; Robinhood remains a funding preference pending partner setup. WalletConnect is the external-wallet login path supplied by Privy.
-- `POST /api/session` verifies Privy ES256 signature, issuer, audience, subject, and expiration before setting a Secure, HttpOnly, SameSite=Lax cookie on `mybluefinancial.com`. No tokens are placed in URLs.
-- `onboard.mybluefinancial.com/<opaque-user-id>` verifies the same session; the URL is a deterministic identifier, never an access credential. Visiting a different ID resumes the signed-in user's own ID.
-- Privy SDK sessions remain on the Financial origin. The onboarding page uses only the verified backend session, avoiding a second SDK login on another origin.
-- Funding destinations come from a server lookup of the verified Privy user. The onboarding page shows separately observed Base balances when Alchemy is configured; balances and provider returns never prove a completed purchase.
+## Reconciliation and provenance
 
-Required environment: `PRIVY_APP_ID` (public application identifier). Privy must allow `https://mybluefinancial.com` and `https://www.mybluefinancial.com` for SDK use. The onboarding origin uses the shared backend session. Enable email and wallet login in Privy, and configure the app's external-wallet/WalletConnect settings. No Privy app secret is required for JWT verification against its public JWKS.
+PR #3 originally contained Privy authentication, embedded-wallet lookup and Privy JWT verification at `1e8384480b0ef84c97dbaa8314979fb2592d31d4`. Those dependencies, browser integrations, environment variables and server calls have been removed from this application and its lockfile.
 
-Run `npm ci`, `npm run typecheck`, `npm test`, `npm run build`. Deploy with `vercel deploy --prod --scope myblue` only after verifying `.vercel/project.json` points to `myblue/mybluefinancial` (`prj_gsk6hiX4VI6Wou3mC8TXNZjHs6gn`).
+The prior connection-only preview was `https://mybluefinancial-3bcpsj2m2-myblue.vercel.app/wallet` (deployment `dpl_2zpENDWavBoaBHDTSmGk7nrU5wwk`). Vercel reports a CLI deployment with no Git metadata. Its source tree includes `src/wallet.ts` and a `/wallet` entry; the file retrieval tool truncates the wallet source. This revision implements the same direct browser-wallet approach and adds verified authentication; it is not represented as an exact import of that unpublished working copy. The old preview has not been redeployed by this change.
 
-The Work project routes are managed separately with `vercel routes ... --project my-blue-collar --scope myblue`. Routes are host-limited to mybluework.com and www.mybluework.com: coin rewrite, login redirect, create redirect, and onboarding redirect. Review drafts with `vercel routes list --diff`, then publish. Financial's previous production deployment is `mybluefinancial-lf3cf2apr-myblue.vercel.app` for rollback.
+## User flow and supported accounts
 
-A real first-user login, wallet creation, recovery/export, and signed-in cross-domain handoff require the user to complete Privy's authentication UI. Never treat a rendered modal or mocked JWT tests as proof those user flows succeeded.
+1. Open `/wallet` (also served for `/login`, `/create`, `/signup`, `/register`, `/onboard`) on the configured origin. Choose an installed EIP-6963 browser wallet or the legacy injected provider. On mobile, use a wallet's built-in browser. No QR WalletConnect integration is implied.
+2. Approve account access and select Base (chain 8453). Connection alone is not authentication. The app never silently switches networks.
+3. Select **Verify wallet**. The server issues an EIP-4361 message with the exact domain, URI, address, chain, random nonce, issue time and five-minute expiry. `personal_sign` signs that human-readable message; no transaction, token approval or transfer is requested.
+4. The server recovers the EIP-191 signer from its stored message and compares it with the challenged address. The request may supply only the signature, never a replacement message, origin, address or destination. One atomic compare-and-swap consumes the challenge and creates a server session. Concurrent verification/replay has at most one winner.
+5. Funding remains optional and unavailable. The page never opens a checkout. Returning from a provider is not funding confirmation.
 
-## Coinbase funding backend
+Supported verification is externally owned Ethereum accounts using 65-byte EIP-191 signatures. Contract wallets/EIP-1271, counterfactual wallets, Solana, account linking and custodial accounts are not supported. Do not claim general wallet compatibility from browser provider discovery alone. There is no embedded wallet creation or server custody of wallet keys.
 
-`GET /api/funding` authenticates the existing session cookie and resolves the embedded Ethereum wallet through Privy's server API. It returns `wallet`, `asset: USDC`, `network: base`, and `providers.coinbase` / `providers.robinhood` availability/mode/reason plus `balances`. `POST /api/funding` accepts `{ "provider": "coinbase" }` and returns a provider `url`. `{ "provider": "robinhood" }` returns 503 until a verified partner integration exists; other providers/extra fields are rejected. Both routes enforce a trusted request host and same-origin access; POST requires an exact Origin header. No recipient, amount, country, or callback is accepted from the browser.
+## Session, cancellation and recovery
 
-Copy the variable names in `.env.example` into your server environment. In addition to `PRIVY_APP_ID`, funding requires `PRIVY_APP_SECRET`, `CDP_API_KEY_ID`, and `CDP_API_KEY_SECRET`. Use a CDP Secret API key with Onramp access: ES256 P-256 PEM (real newlines or escaped `\n`) or base64 Ed25519 64-byte seed+public secret. Keep these three secrets server-side; never prefix them with `VITE_` or commit their values. Missing/invalid key configuration reports unavailable. An unavailable Privy lookup returns an error, never an invented wallet.
+- A server-generated 256-bit opaque identifier is held only in `__Host-myblue-session`: Secure, HttpOnly, SameSite=Strict, Path=/, no Domain. It initially identifies a pending challenge and is never supplied by the client or returned in JSON. The store hashes the identifier for its key.
+- Sessions last at most one hour, with absolute expiry checked server-side on every authenticated read. Challenges last five minutes. Sessions are bound to the verified address, Base chain and exact configured HTTPS origin. Sessions do not cross subdomains; deploy and authenticate on one canonical origin. Switching origin requires a fresh proof.
+- A shared Redis REST store holds challenges and sessions. Production has **no in-memory fallback**. Redis TTLs bound retention; a Lua compare-and-swap atomically consumes challenges across instances. Store failures return 503 rather than accepting a session.
+- Cancel/disconnect/logout deletes the server record and expires host and legacy session cookies. A verification response does not set a new cookie, so a late response cannot recreate one after logout. Browser mutations are serialized; cancelling during connection/signature requests ignores late wallet results. Account, chain and disconnect events revoke the session and require a fresh proof.
+- Failed logout is shown honestly and can be retried. An offline client cannot promise immediate server revocation; absolute expiry remains the backstop. A closed page does not itself revoke the session. Do not equate a UI disconnect with revocation until the DELETE succeeds.
+- Reload/recovery requires reconnecting and signing again with the same wallet. Another wallet is another identity. MyBlue cannot recover a lost key, migrate an old Privy identity automatically, or access an old embedded wallet. Users must retain access to their original wallet through their wallet provider's supported recovery/export process. Never ask for seed phrases or private keys.
+- Challenge issuance is capped at 120/minute per origin in shared storage. This is an availability backstop, not a complete abuse defense; deploy per-client rate limiting and verify it before release.
 
-`COINBASE_ONRAMP_MODE` defaults to `sandbox`, which prefixes the opaque partner reference with `sandbox-`. Set `production` explicitly only after provider setup and sandbox validation. Production permits only `https://pay.coinbase.com`; sandbox also permits `https://pay-sandbox.coinbase.com`. Redirects return to the verified user's fixed onboarding URL with `funding=returned`; a return does not prove a purchase or deposit. Set `FUNDING_PREVIEW_ORIGIN` only when needed to one exact trusted HTTPS preview origin without a trailing slash; preview cookies remain local to that host.
+## Configuration (server only)
 
-Provider setup references: [Create Onramp Session](https://docs.cdp.coinbase.com/api-reference/v2/rest-api/onramp/create-an-onramp-session), [CDP authentication](https://docs.cdp.coinbase.com/api-reference/v2/authentication), and [Privy user lookup](https://docs.privy.io/api-reference/users/get). The Coinbase session reference documents the `partnerUserRef` field used for the sandbox prefix. Configure allowed domains/redirects in the provider dashboard as required. No live credentials, session creation, funds movement, or production deployment were used to verify this backend.
+Use `.env.example` names through the deployment secret manager; never commit credentials or put them in `VITE_` variables:
 
+| Name | Purpose |
+| --- | --- |
+| `AUTH_ORIGIN` | One exact HTTPS origin, no path/trailing slash/wildcard; requests must match host and origin |
+| `AUTH_REDIS_REST_URL` | HTTPS origin of a provisioned Redis REST endpoint implementing GET, SET NX EX, DEL and EVAL |
+| `AUTH_REDIS_REST_TOKEN` | Server-only Redis authorization token, access restricted to the auth store |
 
-## Onboarding, Robinhood partner setup, and Base balances
+Unset configuration keeps sign-in unavailable (503). Local Vite serves UI only; use an HTTPS function-capable preview for real integration testing. No datastore or credentials have been provisioned by this change. A real shared-store integration test is still required; unit tests use a test-only store implementing the atomic contract and mocked REST transport.
 
-The public onboarding page loads funding options only after session verification and the signed-in user's path check. It shows the verified receiving address and **USDC on Base** before a launch button appears. Sandbox is labeled on both context and button. Clicking the Coinbase button creates an authenticated server session; the browser independently validates the returned provider, mode, asset, network, and exact HTTPS provider origin. Funding remains optional and WalletConnect retains its existing wallet management path. Provider return parameters are informational only: no transaction status, completion, or purchase causality is inferred from a redirect or observed balance.
+## Funding interlock and retained integration code
 
-Robinhood returns `available: false`, `mode: unavailable`, `reason: partner_setup_required`. There is no guessed Robinhood URL, SDK package, callback, or credential variable. The consumer page offers fund later and, when configured, Coinbase. Developer setup requires:
+`GET /api/funding` exposes only a verified server session's wallet and reports providers unavailable. It never reads an address from query/body input. Anonymous/expired/unverified sessions get 401; unconfigured authentication gets 503. `POST /api/funding` rejects destination/callback overrides and returns 503 even with valid credentials. Both Coinbase and Robinhood are blocked. There is **no environment toggle** that enables transactions and no provider-session request in the handler.
 
-1. Apply through the **Let's connect** partner form on the [official Robinhood on-ramp page](https://robinhood.com/us/en/on-ramp/). The [partner form](https://docs.google.com/forms/d/e/1FAIpQLSexjyp2eyvsKh8Qubz-ezhEjGQgYG106FGv_BS8g6ExJmlRow/viewform) is a developer application, not a consumer funding destination.
-2. Obtain a Robinhood-issued **Application ID**, the supplied SDK and integration documentation under its [Connect Tools license](https://cdn.robinhood.com/assets/robinhood/legal/Robinhood-Connect-Tools-License-Agreement.pdf). Confirm the documented environment, supported assets/networks, receiving-wallet binding, launch method, approved origins/callbacks, and transaction-status verification contract.
-3. Implement and test that supplied contract against the verified Privy wallet before enabling availability. Callback handling must not claim completion without provider verification. Robinhood Trading API, WalletConnect, Robinhood Chain RPC, and an [Alchemy directory listing](https://www.alchemy.com/dapps/robinhood) do not provide this Connect contract.
+CDP signing, provider URL allowlisting and exact Base ETH/USDC observation helpers remain isolated and tested for a future reviewed integration. They are not wired to an active funding or balance path. No credential presence is interpreted as account approval. Future funding must derive the destination exclusively from the authenticated session, re-check session validity at launch, and bind provider order/status records to that session's address and chain. Query parameters, arbitrary addresses, browser state, balances and a provider return URL are never evidence of completed funding.
 
-For optional balance observations, add `ALCHEMY_API_KEY` to the server environment using `.env.example`; never expose it through `VITE_` or browser code. The verified Alchemy app `myblue_bridge` (`lh6arr2d54y5zlj4`) supports Base mainnet, but the connector reveals only a masked API key; balance reads have not been activated. Current Vercel configuration has only `PRIVY_APP_ID`; funding and balance credentials still need secure provisioning.
+Before any separate change enables funding:
 
-The server fixes the endpoint to `https://base-mainnet.g.alchemy.com/v2/{key}` and validates the key as one path segment. It calls `eth_getBalance` and `alchemy_getTokenBalances` for the verified wallet and only Circle's official Base USDC contract `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`. It checks JSON-RPC IDs/errors, response address, token contract/error, and bounded hexadecimal balances before exact BigInt conversion (ETH 18 decimals, USDC 6). No floating-point rounding is used.
+- Verify durable-store atomicity, expiry and revocation across deployed instances; test exact origins, HTTPS cookies, per-client rate limiting, account changes, cancellation and replay against the deployment.
+- Complete a human connection/sign-in/recovery test with each advertised wallet. Independently review authentication and session handling.
+- Confirm Coinbase organization/account approval, applicable geography, current product/API contract and approved exact callback origins. Provision scoped credentials only through a secret manager.
+- Coinbase documentation flags hosted **guest checkout** as discontinued June 30, 2026; do not revive a legacy guest debit-card/Apple Pay flow. Confirm whether the approved product is hosted Coinbase-account login or Headless Onramp before implementing its contract.
+- Use an explicitly approved sandbox/non-value flow first, including destination binding, provider URL validation, cancellation, timeout, callback/order ownership and authenticated status verification. The old signing helpers alone do not establish API compatibility.
+- Only after the preceding checks, make a separately reviewed release change and perform an explicitly authorized small user-funded transaction. Confirm the exact destination/network and provider order status. No live funded test has been performed here.
+- Robinhood remains unavailable without its issued partner Application ID, approved SDK contract and separate validation.
 
-`balances` returns `{ available: true, network: "base", observedAt, native: { asset: "ETH", amount }, token: { asset: "USDC", amount } }`, with decimal strings. Missing configuration/wallet or any upstream/malformed response returns `{ available: false, network: "base", reason }` with no amounts. A real successful zero remains distinguishable from failure. The observation timestamp is the server read time; the two reads use latest state and are not an atomic block snapshot. These balances are independent of on-ramp transaction status.
+## Validation
 
-References: [Alchemy Base API](https://www.alchemy.com/docs/base/base-api-overview), [token balances](https://www.alchemy.com/docs/data/token-api/token-api-endpoints/alchemy-get-token-balances), [Circle USDC addresses](https://developers.circle.com/stablecoins/usdc-contract-addresses). Run `npm test`, `npm run typecheck`, and `npm run build`. Node VM DOM tests cover browser control flow, not real provider/Privy authentication or visual browser validation.
+Run from this directory with Node 24:
+
+```sh
+npm ci --ignore-scripts
+npm test
+npm run typecheck
+npm run build
+```
+
+Build policy scans source/lockfile and built output for retired authentication imports/configuration. Tests exercise real wallet signatures, wrong signer/message/domain/chain, replay/concurrent consumption, expiry, cancellation races, logout, malformed inputs, origin/cookie checks, user rejection/account changes, funding interlocks and retained provider helpers. No human wallet, live datastore, real Coinbase checkout, or production deployment is implied by these tests.
+
+References: [EIP-4361](https://eips.ethereum.org/EIPS/eip-4361), [Viem SIWE](https://viem.sh/docs/siwe/utilities/createSiweMessage), [Redis REST EVAL](https://upstash.com/docs/redis/commands/scripting/eval), [Coinbase Onramp overview](https://docs.cdp.coinbase.com/onramp/onramp-overview).

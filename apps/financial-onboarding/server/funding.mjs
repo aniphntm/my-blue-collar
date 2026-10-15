@@ -1,27 +1,10 @@
 import { createPrivateKey, createPublicKey, randomBytes } from 'node:crypto';
 import { SignJWT } from 'jose';
-import { userPath, verifyToken } from './session.mjs';
+import { authenticatedSession, trustedOrigin, parseBody } from './session.mjs';
+import { createStore } from './store.mjs';
 
-const SESSION_URL = 'https://api.cdp.coinbase.com/platform/v2/onramp/sessions';
-const SESSION_URI = 'POST api.cdp.coinbase.com/platform/v2/onramp/sessions';
-const HOSTS = ['mybluefinancial.com', 'www.mybluefinancial.com', 'onboard.mybluefinancial.com'];
-const COOKIE = '__Secure-myblue-session';
-const DEFAULTS = { asset: 'USDC', network: 'base' };
 export const BASE_USDC = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
-
-function trustedOrigin(req, env) {
-  const origins = HOSTS.map(host => `https://${host}`);
-  if (env.FUNDING_PREVIEW_ORIGIN) {
-    try {
-      const preview = new URL(env.FUNDING_PREVIEW_ORIGIN);
-      if (preview.protocol === 'https:' && preview.origin === env.FUNDING_PREVIEW_ORIGIN && !preview.username && !preview.password) origins.push(preview.origin);
-    } catch { /* Invalid preview configuration never widens access. */ }
-  }
-  const expected = `https://${req.headers.host}`;
-  if (!origins.includes(expected)) return false;
-  if (req.headers.origin !== undefined) return req.headers.origin === expected;
-  return req.method === 'GET' && !['cross-site', 'same-site'].includes(req.headers['sec-fetch-site']);
-}
+const SESSION_URI = 'POST api.cdp.coinbase.com/platform/v2/onramp/sessions';
 
 export function coinbaseKey(secret) {
   if (typeof secret !== 'string') throw new Error('Invalid key');
@@ -70,16 +53,6 @@ async function requestJSON(fetchImpl, url, options, timeoutMs) {
   } finally { clearTimeout(timer); }
 }
 
-export async function resolveWallet(subject, env, fetchImpl, timeoutMs = 8000) {
-  const user = await requestJSON(fetchImpl, `https://api.privy.io/v1/users/${encodeURIComponent(subject)}`, {
-    headers: { Authorization: `Basic ${Buffer.from(`${env.PRIVY_APP_ID}:${env.PRIVY_APP_SECRET}`).toString('base64')}`, 'privy-app-id': env.PRIVY_APP_ID },
-  }, timeoutMs);
-  if (user?.id !== subject || !Array.isArray(user.linked_accounts)) throw new Error('Invalid user');
-  const wallet = user.linked_accounts.find(account => account.type === 'wallet' && account.chain_type === 'ethereum' && account.wallet_client_type === 'privy'
-    && typeof account.address === 'string' && /^0x[0-9a-fA-F]{40}$/.test(account.address) && !/^0x0{40}$/.test(account.address));
-  return wallet ? { address: wallet.address, chainType: 'ethereum', walletClientType: 'privy' } : null;
-}
-
 // Integer arithmetic preserves every wei and USDC base unit, including large balances.
 export function formatUnits(value, decimals) {
   if (typeof value !== 'string' || !/^0x[0-9a-fA-F]{1,64}$/.test(value)) throw new Error('Invalid balance');
@@ -115,51 +88,30 @@ export async function readBalances(wallet, env, fetchImpl, timeoutMs = 8000) {
   } catch { return unavailable('upstream_unavailable'); }
 }
 
-export function makeHandler({ verify = verifyToken, fetchImpl = globalThis.fetch, env = process.env, timeoutMs = 8000 } = {}) {
+// Release interlock: deliberately no environment switch and no provider-launch call.
+// Re-enable only in a reviewed change after the README release checks have evidence.
+export function makeHandler({ env = process.env, store, now = Date.now } = {}) {
   return async (req, res) => {
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Vary', 'Cookie, Origin, Sec-Fetch-Site');
     if (!['GET', 'POST'].includes(req.method)) { res.setHeader('Allow', 'GET, POST'); return res.status(405).json({ error: 'Method not allowed' }); }
-    if (!trustedOrigin(req, env)) return res.status(403).json({ error: 'Invalid origin' });
-    const cookies = (req.headers.cookie || '').split(';').map(value => value.trim()).filter(value => value.startsWith(`${COOKIE}=`));
-    const token = cookies.length === 1 ? cookies[0].slice(COOKIE.length + 1) : null;
-    if (!token || token.length > 8192) return res.status(401).json({ error: 'Sign in to continue.' });
-    let claims;
+    if (!env.AUTH_ORIGIN) return res.status(503).json({ error: 'Funding is paused pending security and provider checks.' });
+    const origin = trustedOrigin(req, env);
+    if (!origin) return res.status(403).json({ error: 'Invalid origin' });
     try {
-      claims = await verify(token);
-      if (typeof claims.sub !== 'string' || !claims.sub.startsWith('did:privy:')) throw new Error('Invalid identity');
-    } catch { return res.status(401).json({ error: 'Your sign-in has expired. Please sign in again.' }); }
-    if (req.method === 'POST') {
-      let body = req.body;
-      try { if (typeof body === 'string' && body.length <= 1024) body = JSON.parse(body); } catch { body = null; }
-      if (!body || typeof body !== 'object' || Array.isArray(body) || !['coinbase', 'robinhood'].includes(body.provider) || Object.keys(body).some(key => key !== 'provider')) return res.status(400).json({ error: 'Choose a supported funding provider.' });
-      if (body.provider === 'robinhood') return res.status(503).json({ error: 'Robinhood funding is not available yet. You can fund later or choose Coinbase.' });
-    }
-    const mode = env.COINBASE_ONRAMP_MODE || 'sandbox';
-    const walletConfigured = !!(env.PRIVY_APP_ID && env.PRIVY_APP_SECRET);
-    let coinbaseConfigured = !!(walletConfigured && env.CDP_API_KEY_ID && env.CDP_API_KEY_SECRET && ['sandbox', 'production'].includes(mode));
-    if (coinbaseConfigured) {
-      try { coinbaseKey(env.CDP_API_KEY_SECRET); } catch { coinbaseConfigured = false; }
-    }
-    let wallet = null;
-    if (walletConfigured) {
-      try { wallet = await resolveWallet(claims.sub, env, fetchImpl, timeoutMs); }
-      catch { return res.status(502).json({ error: 'Unable to verify your receiving wallet. Please try again.' }); }
-    }
-    const available = coinbaseConfigured && !!wallet;
-    if (req.method === 'GET') return res.status(200).json({ authenticated: true, wallet, ...DEFAULTS,
-      balances: await readBalances(wallet, env, fetchImpl, timeoutMs),
-      providers: { robinhood: { available: false, mode: 'unavailable', reason: 'partner_setup_required' }, coinbase: { available, mode: ['sandbox', 'production'].includes(mode) ? mode : 'unavailable', reason: available ? null : !walletConfigured ? 'wallet_verification_not_configured' : !wallet ? 'embedded_wallet_required' : 'provider_not_configured' } } });
-    if (!available) return res.status(503).json({ error: 'Coinbase funding is not available yet.' });
-    try {
-      const path = userPath(claims.sub);
-      const authorization = await createCoinbaseJWT(env.CDP_API_KEY_ID, env.CDP_API_KEY_SECRET);
-      const result = await requestJSON(fetchImpl, SESSION_URL, { method: 'POST', headers: { Authorization: `Bearer ${authorization}`, 'Content-Type': 'application/json' }, body: JSON.stringify({
-        purchaseCurrency: DEFAULTS.asset, destinationNetwork: DEFAULTS.network, destinationAddress: wallet.address,
-        partnerUserRef: `${mode === 'production' ? '' : 'sandbox-'}${path}`,
-        redirectUrl: `https://onboard.mybluefinancial.com/${path}?provider=coinbase&funding=returned`,
-      }) }, timeoutMs);
-      return res.status(200).json({ provider: 'coinbase', mode, ...DEFAULTS, url: validateCoinbaseUrl(result?.session?.onrampUrl, mode) });
-    } catch { return res.status(502).json({ error: 'Unable to start Coinbase funding. Please try again.' }); }
+      const session = await authenticatedSession(req, store || createStore(env), origin, now());
+      if (!session) return res.status(401).json({ error: 'Verified wallet sign-in required.' });
+      if (req.method === 'POST') {
+        let body;
+        try { body = parseBody(req, ['provider']); } catch { return res.status(400).json({ error: 'Invalid funding request.' }); }
+        if (!['coinbase', 'robinhood'].includes(body.provider)) return res.status(400).json({ error: 'Choose a supported funding provider.' });
+        return res.status(503).json({ error: 'Funding is paused pending security and provider checks.' });
+      }
+      return res.status(200).json({ authenticated: true, wallet: { address: session.address, chainId: session.chainId }, asset: 'USDC', network: 'base',
+        balances: { available: false, reason: 'paused' }, providers: {
+          coinbase: { available: false, mode: 'unavailable', reason: 'security_and_provider_checks_required' },
+          robinhood: { available: false, mode: 'unavailable', reason: 'partner_setup_required' },
+        } });
+    } catch { return res.status(503).json({ error: 'Secure session service unavailable. Funding remains paused.' }); }
   };
 }

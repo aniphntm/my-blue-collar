@@ -2,10 +2,9 @@
   "name": "myblue-funnel-release",
   "version": "1.0.0",
   "description": "",
-  "main": "funnel.js",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "build": "vite build",
+    "build": "node scripts/check-auth-policy.mjs && vite build && node scripts/check-auth-policy.mjs dist",
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.mjs"
   },
@@ -14,15 +13,13 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "@privy-io/react-auth": "^3.49.1",
-    "@types/node": "^26.6.5",
-    "@types/react": "^19.3.0",
-    "@types/react-dom": "^19.3.0",
-    "jose": "^6.2.12",
-    "react": "^19.3.1",
-    "react-dom": "^19.3.1",
-    "typescript": "^5.9.3",
-    "vite": "^8.3.4"
+    "jose": "6.2.12",
+    "viem": "2.57.7"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@types/node": "26.6.5",
+    "typescript": "5.9.3",
+    "vite": "8.3.4"
+  }
 }
