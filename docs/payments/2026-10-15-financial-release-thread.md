@@ -7,6 +7,10 @@
 Base: `742a06071e01318fd931224a06e2c045d7cc442a` (`origin/main`).
 Candidate: `codex/banking-consolidation`.
 
+Operational handoff: [Stacy release operations runbook](financial-ops-runbook.md).
+Adobe handoff delivery is unconfirmed because the Stacy connection returned a
+service error; proposed owners and telemetry are documented there.
+
 | Source branch and frozen tip | Squash commit | Scope |
 | --- | --- | --- |
 | `payments` — `723375ac194ee44491d014635e98baad567272f1` | `273f0cf` | Apple Pay funding plan only |
