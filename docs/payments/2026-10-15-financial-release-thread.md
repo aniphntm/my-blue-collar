@@ -4,6 +4,57 @@
 
 ## Source reconciliation
 
+### October 16 continuation: release remains blocked
+
+Technical thread update: the banking candidate has a READY Git preview for the
+root application, while the requested hostname belongs to a separate production
+project. Its source still needs reconciliation with the candidate; authenticated
+onboarding and Coinbase, Robinhood and Kraken funding are not verified live.
+
+- PR [#4](https://github.com/aniphntm/my-blue-collar/pull/4) remains an open,
+  mergeable draft at inspected head
+  `76ad3cd40553d92051c68feb6ec6b8ef25001356`. Its three source squash commits
+  are present, but none has been merged into `main` by this continuation.
+- Vercel reports Git preview `dpl_JDJVZX3czN1MmKVe2HczJWwreuED` READY for
+  that exact head in project `my-blue-collar`, team `myblue`:
+  <https://my-blue-collar-7bs2tvkj8-myblue.vercel.app>.
+  This is the root Next.js application, not evidence that the separate
+  `apps/financial-onboarding` Vite application or its API functions are deployed.
+  READY is deployment metadata, not an end-to-end authentication result.
+- A fresh, complete Financial project domain listing contains 14 entries and
+  excludes `app.myblue.finance`. A direct lookup of that domain in
+  `mybluefinancial` returns `404 / Project Domain not found`. This only establishes
+  absence from that project; it does not establish DNS state or ownership
+  elsewhere. Existing Financial domains must not be moved by assumption.
+- While this update was being prepared, the remote release branch advanced to
+  `592b842` with additional deployment evidence. Those changes were preserved.
+  A fresh project lookup confirms `myblue-finance-app`
+  (`prj_3rQds32rTpY3NphUkB1LOgKM6aZE`) in team `myblue` lists both
+  `app.myblue.finance` and `myblue.finance`, with latest production deployment
+  `dpl_AfNV1PJb76BBYeLJ2fSURD3fzhGw` READY. This resolves project ownership
+  within Vercel, but does not bind that production source to PR #4.
+- Alchemy's current `myblue_bridge` detail still lists Base, Ethereum and Solana
+  mainnets. This supplies network infrastructure, not an approved fiat on-ramp.
+- Fresh local onboarding validation passes all 28 tests, TypeScript, Vite build
+  and source/build authentication policy scans. The existing test suite verifies
+  that funding cannot launch even with credentials or enable flags. It does not
+  test a live Redis service, human wallet or provider checkout.
+- All five payment-rail tests also pass again, including unauthorized requests
+  and webhook tampering/mode rejection. Both dependency installs used
+  `npm ci --ignore-scripts`; no application implementation changed.
+- The requested Slack destination is
+  [#banking_war_room](https://aniphntm.slack.com/archives/C0C9R654R1P), channel
+  `C0C9R654R1P`, in the connected personal workspace. It is distinct from the
+  MyBlueGroup workspace, where the banking-channel search returned no result.
+
+Resume by reconciling the production source and intended app root/canonical
+origin, secure shared authentication storage and deployed security/wallet checks,
+then validated
+provider account/product/API contracts and sandbox evidence. Keep funding paused
+and the consolidation draft until those release checks have evidence. No
+production promotion, domain change, funding enablement or value transfer was
+performed during this continuation.
+
 Base: `742a06071e01318fd931224a06e2c045d7cc442a` (`origin/main`).
 Candidate: `codex/banking-consolidation`.
 
