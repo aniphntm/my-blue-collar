@@ -143,3 +143,43 @@ Once specified, verify token identity, decimals, bridge representation, existing
 pools, wallet balances and gas; prepare and simulate the exact transactions, then
 record the reviewed execution parameters and resulting pool addresses and receipts.
 No pool address, transaction hash or active liquidity is claimed here.
+
+
+## October 16 continuation — deployed preview and launch blockers
+
+> Technical thread: The banking consolidation remains draft PR #4; the existing
+> production hostname serves a separate early-access demo, with account setup
+> and fiat funding paused. Alchemy network configuration does not establish
+> Coinbase, Robinhood or Kraken on-ramp readiness.
+
+Read-only checks at approximately 00:20 UTC:
+
+- PR #4 is open, draft and mergeable. Its inspected head was
+  `76ad3cd40553d92051c68feb6ec6b8ef25001356`; the Vercel commit status
+  was successful. This status alone does not establish banking integration tests.
+- `app.myblue.finance` belongs to Vercel team `myblue`, project
+  `myblue-finance-app` (`prj_3rQds32rTpY3NphUkB1LOgKM6aZE`).
+  Production deployment `dpl_AfNV1PJb76BBYeLJ2fSURD3fzhGw` is READY.
+  It was created through the CLI and returns no Git commit metadata. Its source
+  tree includes banking demo and Increase sandbox files; it is not established
+  as the PR #4 source tree.
+- The app hostname returns HTTP 308 to `https://myblue.finance/`.
+  The apex returns HTTP 200 with “Early access preview”, “Demo balances” and
+  “Banking and funding are not yet available.” This corrects the unresolved
+  hostname association above; absence from `mybluefinancial` did not imply
+  absence from Vercel.
+- `GET https://myblue.finance/api/funding` returns HTTP 503, `no-store`,
+  `reason: account_setup_paused`, and false authentication, wallet creation
+  and funding flags. Coinbase and Robinhood report unavailable. The response
+  does not establish a Kraken integration.
+- The managed shell could not start commands (exec-server: “No such file or
+  directory”), so local source reconciliation and tests could not be rerun.
+
+Release remains blocked on reconciling the deployed CLI source with the reviewed
+candidate, selecting the intended app root and canonical auth origin, securely
+provisioning and validating shared authentication storage, completing deployed
+and human wallet checks, and validating each provider's approved product/API.
+The account-setup pause is observed behavior, not a working banking launch.
+No merge to main, production promotion, credential change or value transfer was
+performed during this continuation. Documentation and the banking war-room
+handoff record the actual status.
