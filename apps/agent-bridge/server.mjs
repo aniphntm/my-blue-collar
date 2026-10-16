@@ -2,11 +2,13 @@ import { createServer } from 'node:http';
 import { readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { BridgeError, BridgeStore, contextBudget, mixedReward } from './core.mjs';
+import { ConcordiaRouter } from './concordia-router.mjs';
 
 const { values } = parseArgs({ options: { 'org-chart': { type: 'string' }, db: { type: 'string' }, port: { type: 'string', default: '8787' } } });
 if (!values['org-chart'] || !values.db) throw new Error('Pass --org-chart PATH and --db PATH. Use a persistent disk.');
 const config = JSON.parse(readFileSync(values['org-chart'], 'utf8'));
 const store = new BridgeStore(values.db, config);
+const router = new ConcordiaRouter(store, { mailbox: config.mailbox ?? {}, wallets: config.wallets ?? [] });
 const authUrl = process.env.BRIDGE_SUPABASE_URL;
 if (!authUrl || new URL(authUrl).protocol !== 'https:' || !process.env.BRIDGE_SUPABASE_PUBLISHABLE_KEY)
   throw new Error('Configure the current project HTTPS URL and publishable key; no auth bypass is available.');
@@ -39,6 +41,8 @@ createServer(async (request, response) => {
       agents: config.leaders.filter(a => a.owner_user_id === actor.userId).map(a => ({ agent_id: a.agent_id, domain_id: a.domain_id })),
       context_budget: contextBudget(config, 10000),
     });
+    if (request.method === 'GET' && url.pathname === '/concordia/observations') return reply(200, { observations: router.observations(actor, url.searchParams.get('agent_id')) });
+    if (request.method === 'GET' && url.pathname === '/concordia/outbox') return reply(200, { commands: router.outbox(actor, url.searchParams.get('agent_id')) });
     if (request.method === 'GET' && url.pathname === '/inbox') return reply(200, { messages: store.inbox(actor, url.searchParams.get('agent_id')) });
     if (request.method !== 'POST') return reply(405, { error: 'Use an implemented GET or POST endpoint.' });
     if (!request.headers['content-type']?.startsWith('application/json')) throw new BridgeError(415, 'Use application/json.');
@@ -50,6 +54,10 @@ createServer(async (request, response) => {
     const input = JSON.parse(body);
     if (!input || typeof input !== 'object' || Array.isArray(input)) throw new BridgeError(400, 'Invalid request.');
     const path = url.pathname;
+    if (path === '/concordia/ingest') return reply(201, router.ingest(actor, input));
+    if (path === '/concordia/commands') return reply(201, router.command(actor, input));
+    if (path === '/concordia/approve') return reply(200, router.approve(actor, input));
+    if (path === '/concordia/acknowledge') return reply(200, router.acknowledge(actor, input));
     if (path === '/messages') return reply(201, store.send(actor, input));
     if (path === '/letters') return reply(200, store.remember(actor, input));
     if (path === '/recall') return reply(200, { matches: store.recall(actor, input), method: 'literal_term_search' });
