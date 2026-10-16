@@ -99,6 +99,29 @@ observations establishes fiat settlement, exchange listing or BLUE liquidity.
 No live flags, credentials, database migrations, provider settings, production
 deployment or value transfers were changed by this consolidation.
 
+## October 16 continuation checkpoint
+
+Read-only checks reconfirmed PR #4 is open, draft and unmerged at
+`76ad3cd40553d92051c68feb6ec6b8ef25001356`; main and all three source tips
+in the reconciliation table are unchanged. The prior local validation above
+was not rerun during this documentation checkpoint.
+
+The `mybluefinancial` project still lists 14 domains and does not include
+`app.myblue.finance`. Its latest deployment, `dpl_9Ba3zNsxpHELhjkprKv1QNNoGQXR`
+(`mybluefinancial-h84d2mor4-myblue.vercel.app`), is READY with source `cli`,
+target `null`, no aliases and empty metadata. Inspection requested Git repository
+information but returned no Git source or commit binding. READY alone therefore
+does not establish that this deployment contains the consolidation candidate or
+that production routing is correct. This check did not inspect runtime secrets
+or test deployed authentication/provider behavior.
+
+The requested Slack destination was located as public `#banking_war_room`
+(`C0C9R654R1P`) in the `brain` workspace, not the MyBlue work workspace.
+At inspection it contained only join/invitation messages. The technical update
+should link this evidence and PR #4, explicitly retain paused funding and avoid
+claiming a production release. No production promotion, main merge, domain
+change or provider enablement was performed during this checkpoint.
+
 ## BLUE pool preparation
 
 Addresses below are repository declarations from `public/coin/myblue-ethos.md`,
