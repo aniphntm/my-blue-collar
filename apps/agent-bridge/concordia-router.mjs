@@ -16,7 +16,7 @@ const outboundTypes = {
 
 function required(value, name, max = 200) {
   if (typeof value !== 'string' || !value.trim() || value.length > max || /[\r\n]/.test(value))
-    throw new BridgeError(400, \`Invalid \${name}.\`);
+    throw new BridgeError(400, `Invalid ${name}.`);
   return value.trim();
 }
 function stable(value) {
@@ -62,7 +62,7 @@ export class ConcordiaRouter {
     this.mailbox = mailbox;
     this.wallets = wallets;
     this.db = store.db;
-    this.db.exec(\`CREATE TABLE IF NOT EXISTS concordia_events (
+    this.db.exec(`CREATE TABLE IF NOT EXISTS concordia_events (
        id TEXT PRIMARY KEY, owner TEXT NOT NULL, agent TEXT NOT NULL,
        channel TEXT NOT NULL, source TEXT NOT NULL, external_id TEXT NOT NULL,
        event_type TEXT NOT NULL, route_id TEXT NOT NULL, payload TEXT NOT NULL,
@@ -74,7 +74,7 @@ export class ConcordiaRouter {
        approved_at TEXT, acknowledged_at TEXT,
        UNIQUE(owner, agent, request_key));
        CREATE INDEX IF NOT EXISTS concordia_event_scope ON concordia_events(owner, agent, created_at);
-       CREATE INDEX IF NOT EXISTS concordia_command_scope ON concordia_commands(owner, agent, status, created_at);\`);
+       CREATE INDEX IF NOT EXISTS concordia_command_scope ON concordia_commands(owner, agent, status, created_at);`);
   }
   authorize(principal, input, capability) {
     const agent = ownedAgent(this.store.config, principal, input.agent_id);
@@ -107,22 +107,22 @@ export class ConcordiaRouter {
     const scope = [principal.userId, input.agent_id, input.channel, source, externalId];
     const id = randomUUID();
     const now = new Date().toISOString();
-    const change = this.db.prepare(\`INSERT OR IGNORE INTO concordia_events
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\`).run(id, ...scope, input.event_type, input.route_id, payload, now);
-    const existing = this.db.prepare(\`SELECT id, event_type, route_id, payload FROM concordia_events
-      WHERE owner=? AND agent=? AND channel=? AND source=? AND external_id=?\`).get(...scope);
+    const change = this.db.prepare(`INSERT OR IGNORE INTO concordia_events
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(id, ...scope, input.event_type, input.route_id, payload, now);
+    const existing = this.db.prepare(`SELECT id, event_type, route_id, payload FROM concordia_events
+      WHERE owner=? AND agent=? AND channel=? AND source=? AND external_id=?`).get(...scope);
     if (existing.event_type !== input.event_type || existing.route_id !== input.route_id || existing.payload !== payload)
       throw new BridgeError(409, 'Source event ID already used for different content.');
     return { id: existing.id, duplicate: change.changes === 0, memory_written: false, provenance: 'authenticated_owner_submission' };
   }
   observations(principal, agentId) {
     ownedAgent(this.store.config, principal, agentId);
-    return this.db.prepare(\`SELECT id, channel, source, external_id, event_type, route_id, payload, created_at
-      FROM concordia_events WHERE owner=? AND agent=? ORDER BY created_at DESC, id DESC LIMIT 100\`)
+    return this.db.prepare(`SELECT id, channel, source, external_id, event_type, route_id, payload, created_at
+      FROM concordia_events WHERE owner=? AND agent=? ORDER BY created_at DESC, id DESC LIMIT 100`)
       .all(principal.userId, agentId).map(e => ({
         id: e.id, kind: 'external_observation', actor_id: agentId,
         channel: e.channel, event_type: e.event_type, route_id: e.route_id,
-        source_ref: \`\${e.source}:\${e.external_id}\`, data: JSON.parse(e.payload),
+        source_ref: `${e.source}:${e.external_id}`, data: JSON.parse(e.payload),
         provenance: 'authenticated_owner_submission', trust: 'untrusted_external_content', created_at: e.created_at,
       }));
   }
@@ -145,11 +145,11 @@ export class ConcordiaRouter {
     const scope = [principal.userId, input.agent_id, input.idempotency_key];
     const status = input.command_type === 'mail.draft' ? 'queued' : 'pending_review';
     const id = randomUUID(), now = new Date().toISOString();
-    const change = this.db.prepare(\`INSERT OR IGNORE INTO concordia_commands
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL)\`)
+    const change = this.db.prepare(`INSERT OR IGNORE INTO concordia_commands
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL)`)
       .run(id, principal.userId, input.agent_id, input.channel, input.command_type,
         input.idempotency_key, input.route_id, serialized, status, now);
-    const existing = this.db.prepare(\`SELECT * FROM concordia_commands WHERE owner=? AND agent=? AND request_key=?\`).get(...scope);
+    const existing = this.db.prepare(`SELECT * FROM concordia_commands WHERE owner=? AND agent=? AND request_key=?`).get(...scope);
     if (existing.channel !== input.channel || existing.command_type !== input.command_type ||
         existing.route_id !== input.route_id || existing.payload !== serialized)
       throw new BridgeError(409, 'Command key already used for different content.');
@@ -165,16 +165,16 @@ export class ConcordiaRouter {
     this.authorize(principal, { agent_id, channel: row.channel, route_id: row.route_id },
       row.channel === 'mail' ? 'send' : 'propose');
     const status = row.channel === 'mail' ? 'queued' : 'awaiting_signature';
-    this.db.prepare(\`UPDATE concordia_commands SET status=?, approved_at=?
-      WHERE id=? AND status='pending_review'\`).run(status, new Date().toISOString(), row.id);
+    this.db.prepare(`UPDATE concordia_commands SET status=?, approved_at=?
+      WHERE id=? AND status='pending_review'`).run(status, new Date().toISOString(), row.id);
     return { id: row.id, status, external_action_executed: false,
       wallet_signature_required: row.channel === 'wallet' };
   }
   outbox(principal, agentId) {
     ownedAgent(this.store.config, principal, agentId);
-    const rows = this.db.prepare(\`SELECT id, channel, command_type, route_id, payload, status, created_at
+    const rows = this.db.prepare(`SELECT id, channel, command_type, route_id, payload, status, created_at
       FROM concordia_commands WHERE owner=? AND agent=? AND status IN ('queued', 'awaiting_signature')
-      ORDER BY created_at, id LIMIT 50\`).all(principal.userId, agentId);
+      ORDER BY created_at, id LIMIT 50`).all(principal.userId, agentId);
     // A revoked mailbox grant or wallet binding immediately hides queued commands.
     return rows.flatMap(row => {
       try {
