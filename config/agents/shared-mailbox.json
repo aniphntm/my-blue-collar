@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "requested_name": "myblue_mafia",
+  "display_name": "MyBlue Mafia",
+  "inbox_id": null,
+  "provider": "AgentMail",
+  "provisioning_status": "blocked_by_three_inbox_plan_limit",
+  "permission_policy": "explicit_per_agent_approval",
+  "approver_user_ids": [],
+  "members": [],
+  "grants": [],
+  "polling_enabled": false,
+  "paid_upgrade_authorized": false
+}
