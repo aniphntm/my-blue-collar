@@ -78,7 +78,9 @@ roster, missing reward weights, inconsistent budgets or actions above the seat c
 The approximately 200,000 BLUE figure remains unallocated in the template because
 the transcript does not resolve total versus per-leader amounts.
 
-Keep Natali's `voting_defi` scope and Stacy's release-operations scope separate.
+Keep Mira's `voting_defi` scope and Stacy's release-operations scope separate.
+Mira replaces the former Natali persona. The user-authorized `natali_stacy`
+handoff combines the supplied briefs, not every private memory or email.
 Enforce scope on every database read/write and job; separate prompt text or
 vector namespaces alone do not enforce authorization. Upstream sharing requires
 an explicit publication into an authorized shared scope.

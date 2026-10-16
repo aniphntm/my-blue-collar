@@ -79,12 +79,19 @@ pass; a user can approve a specific agent without granting every other agent acc
 ## Environment observations
 
 On October 16, 2026 AgentMail listed existing Eve, Natali and Stacy MyBlue inboxes.
-Their account metadata is discovery evidence, not an agent permission grant.
-No mailbox messages were read or sent during discovery.
+The user subsequently replaced Natali with Mira. The existing inbox was updated
+to `Mira | MyBlue Creative`; its email remains `natali-myb@agentmail.to`.
+The combined, user-authorized context is [natali_stacy](natali_stacy.md).
+Account metadata is discovery evidence, not an agent permission grant.
+No mailbox messages were read or sent during discovery. Creating
+`myblue_mafia` was rejected because all three allowed inbox slots are occupied.
+No inbox was deleted or billing plan changed.
 
 The existing `blue-collar-db` project was initially inactive. A resume request
-was accepted and its latest observed state was `COMING_UP`. Current user mapping
-has not yet been verified; no database migration was applied. The managed
+was accepted; the latest observed state is `ACTIVE_HEALTHY`. A read-only count
+found **zero Supabase Auth users**. No current user identities can be linked in
+this project yet; verify the intended identity provider/project rather than
+inventing user mappings. No database migration was applied. The managed
 execution environment has no provisioned application secrets. Do not create a
 second user database or copy identities to work around missing configuration.
 
