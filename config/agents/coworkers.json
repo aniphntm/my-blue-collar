@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "source": "AgentMail discovery and user instructions, 2026-10-16",
+  "agents": [
+    {
+      "agent_id": "mira",
+      "legacy_persona": "natali",
+      "display_name": "Mira | MyBlue Creative",
+      "inbox_id": "natali-myb@agentmail.to",
+      "owner_user_id": null,
+      "shared_mailbox_access": false
+    },
+    {
+      "agent_id": "stacy",
+      "display_name": "Stacy | MyBlue GTM Operations",
+      "inbox_id": "stacy-myb@agentmail.to",
+      "owner_user_id": null,
+      "shared_mailbox_access": false
+    },
+    {
+      "agent_id": "eve",
+      "display_name": "Eve | MyBlue",
+      "inbox_id": "eve-myb@agentmail.to",
+      "owner_user_id": null,
+      "shared_mailbox_access": false
+    }
+  ],
+  "shared_context_id": "natali_stacy",
+  "shared_context_members": ["mira", "stacy"],
+  "shared_inbox": {
+    "requested_name": "myblue_mafia",
+    "inbox_id": null,
+    "status": "blocked_by_plan_limit",
+    "grants": []
+  }
+}
