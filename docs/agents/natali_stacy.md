@@ -30,8 +30,10 @@ User instruction, October 16, 2026: replace Natali with Mira and consolidate
 ## Shared operating context
 
 - Five domain leaders, a first hiring cycle capped at 20 headcount, BLUE as the
-  stated internal income currency. Resolve the approximately 200,000 BLUE
-  allocation interpretation before assigning leader budgets.
+  internal accounting unit: 250,000 BLUE hiring authority per domain,
+  1,250,000 total; one equal voting right per leader. See the
+  [October 17 reconciliation](hiring-allocation-reconciliation.md). The earlier
+  approximately 200,000 ambiguity is not the configured baseline.
 - Retrieve context initially 40% from user/work threads, 40% from permitted
   internal messages and at most 20% from public sources. Keep public activity
   and financial permissions independent from context/reward weights.

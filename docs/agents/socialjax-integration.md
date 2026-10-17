@@ -62,8 +62,10 @@ textbox or tool endpoint. Do not treat a sender-supplied agent ID as authorizati
 ## Point the runner at the org chart
 
 Copy `config/agents/org-chart.example.json` to a private configured location and
-fill the five actual leader entries. Each entry needs `agent_id`, `domain_id`,
-`objective`, `model_ref`, `mailbox_scope` and `blue_allocation`. Select hosted model
+bind the five domain leader slots to actual identities. Each entry needs a unique
+`agent_id`, verified `owner_user_id`, `domain_id`, `objective`, `model_ref` and
+`mailbox_scope`. Keep allocations in `budget.allocations_by_leader`, keyed by stable
+`leader_id`; do not duplicate balances in leader entries. Select hosted model
 credentials through server configuration, never through the org chart.
 
 Set `ORG_CHART_PATH` for the proposed runner. The adapter's intended entry point is:
@@ -75,8 +77,12 @@ ORG_CHART_PATH=config/agents/org-chart.json python bridge/run_cycle.py --mode si
 `bridge/run_cycle.py` and `ORG_CHART_PATH` are proposed integration contracts,
 not existing upstream SocialJax features. The runner must reject an incomplete
 roster, missing reward weights, inconsistent budgets or actions above the seat cap.
-The approximately 200,000 BLUE figure remains unallocated in the template because
-the transcript does not resolve total versus per-leader amounts.
+The template now specifies 250,000 internal BLUE hiring authority for each domain
+leader slot (1,250,000 total), separate from equal voting rights, the global
+20-seat cap and unset reward weights. See the [decision reconciliation](hiring-allocation-reconciliation.md).
+Run `node --test tests/hiring-mechanics.test.mjs` for offline validation scenarios.
+This validates constraints only; it does not implement the SocialJax hiring
+environment, run an election or supply missing identity/reward mappings.
 
 Keep Mira's `voting_defi` scope and Stacy's release-operations scope separate.
 Mira replaces the former Natali persona. The user-authorized `natali_stacy`

@@ -10,10 +10,11 @@ model calls or recurring jobs are started by this handoff.
 Use [the integration contract](socialjax-integration.md) and
 [org-chart template](../../config/agents/org-chart.example.json).
 
-- Model five domain leaders and a 20-seat hiring cycle. Resolve whether the
-  roughly 200,000 BLUE figure is total or per leader before assigning budgets.
-  BLUE is the user's stated internal income currency; no token transfer follows
-  from a simulation reward.
+- Model five domain leaders and a 20-seat hiring cycle. Allocate 250,000 internal
+  BLUE hiring authority per domain (1,250,000 total), with one equal voting right
+  per leader, independent of budget. See the [decision reconciliation](hiring-allocation-reconciliation.md).
+  Leader slots are domain placeholders, not verified identities or funded wallets.
+  No token transfer follows from an allocation or simulation reward.
 - Advance an event-driven decision turn for user work, an addressed internal
   message or scheduled work. A SocialJax tick applies one validated joint action.
   The 15-minute consolidation cadence is a separate clock.
@@ -29,7 +30,7 @@ Use [the integration contract](socialjax-integration.md) and
   adapter and feedback. Context feedback does not update hosted model weights.
 
 Exit: validated mechanics configuration and acceptance scenarios, with missing
-roster, budget, reward and user-identity mappings listed rather than fabricated.
+roster bindings, voting policy, reward and user-identity mappings listed rather than fabricated.
 
 ## Phase 2 — implement, then verify
 
