@@ -1,0 +1,17 @@
+<!-- @dsCard group="Cards" height=470 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>JobThreadRow - preview</title></head>
+<body>
+<div id="root" class="mb-stage"></div>
+<script>
+  var M = window.MyBlue, h = React.createElement;
+
+  var app = h(M.JobThreadList, null,
+    h(M.JobThreadRow, { index: 1, trade: 'Electrical', title: 'Carter kitchen', status: 'On site', crew: 'Mike + 2', activity: '3 photos \u00b7 permit attached', tools: ['Gmail', 'SMS', 'QuickBooks'], tone: 'blue' }),
+    h(M.JobThreadRow, { index: 2, trade: 'HVAC', title: 'Park rooftop unit', status: 'Estimate sent', crew: 'Rosa', activity: 'Customer viewed 18m ago', tools: ['Gmail', 'QuickBooks'], tone: 'amber' }),
+    h(M.JobThreadRow, { index: 3, trade: 'Plumbing', title: 'Northside service call', status: 'Scheduled', crew: 'Truck 3', activity: 'Tomorrow \u00b7 8:30 AM', tools: ['Calendar', 'SMS'], tone: 'emerald' }));
+  ReactDOM.createRoot(document.getElementById('root')).render(app);
+</script>
+</body>
+</html>
