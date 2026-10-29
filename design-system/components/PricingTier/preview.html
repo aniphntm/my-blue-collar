@@ -1,0 +1,20 @@
+<!-- @dsCard group="Cards" height=420 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>PricingTier - preview</title></head>
+<body>
+<div id="root" class="mb-stage"></div>
+<script>
+  var M = window.MyBlue, h = React.createElement;
+
+  var app = h(M.RuleGrid, null,
+    h(M.PricingTier, { name: 'Free', badge: 'Beta, waitlist', desc: 'Everything it takes to run the business.', highlighted: true, cta: 'Join the waitlist',
+      features: ['Scheduling & dispatch', 'Customer CRM & history', 'Estimates & invoicing', 'Growth & referral tools'] }),
+    h(M.PricingTier, { name: 'Pro', badge: 'Coming soon', desc: 'Advanced power for a growing crew.', cta: 'Get notified',
+      features: ['Automation', 'Advanced reporting', 'AI tools', 'Advanced integrations'] }),
+    h(M.PricingTier, { name: 'Network', badge: 'Coming soon', desc: 'Earn from the trades around you.', cta: 'Get notified',
+      features: ['Subcontractor marketplace', 'Verified local trades', 'Overflow jobs & revenue', 'Priority matching'] }));
+  ReactDOM.createRoot(document.getElementById('root')).render(app);
+</script>
+</body>
+</html>

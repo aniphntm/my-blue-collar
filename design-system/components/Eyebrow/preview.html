@@ -1,0 +1,23 @@
+<!-- @dsCard group="Type" height=170 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Eyebrow - preview</title></head>
+<body>
+<div id="root" class="mb-stage"></div>
+<script>
+  var M = window.MyBlue, h = React.createElement;
+
+  var app = h('div', { className: 'mb-stack' },
+    h('div', { className: 'mb-row' },
+      h(M.Eyebrow, null, '01 \u2014 The platform'),
+      h(M.Eyebrow, { tone: 'mut' }, 'Built for'),
+      h(M.Eyebrow, { tone: 'accent' }, 'Available now'),
+      h(M.Eyebrow, { variant: 'rule' }, 'RULE \u2192 one job, one thread')),
+    h('div', { style: { background: 'var(--c-panel)', padding: 16, borderRadius: 'var(--radius-card)' } },
+      h('div', { className: 'mb-row' },
+        h(M.Eyebrow, { tone: 'panel-soft' }, 'Job / Flow'),
+        h(M.Eyebrow, { tone: 'panel' }, 'Illustrative'))));
+  ReactDOM.createRoot(document.getElementById('root')).render(app);
+</script>
+</body>
+</html>

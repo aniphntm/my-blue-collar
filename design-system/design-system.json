@@ -1,0 +1,112 @@
+{
+  "v": 3,
+  "layout": "files",
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-29T23:33:06Z"
+  },
+  "title": "MyBlue Edge",
+  "namespace": "MyBlue",
+  "libraries": [
+    {
+      "name": "react",
+      "version": "18"
+    },
+    {
+      "name": "react-dom",
+      "version": "18"
+    }
+  ],
+  "sections": {},
+  "groups": [
+    "Logos",
+    "Legacy",
+    "Financial"
+  ],
+  "assetGroups": {
+    "Logos": {
+      "name": "Logos",
+      "tile": "l",
+      "order": [
+        "myblue-transparent.svg",
+        "icon.svg",
+        "icon-inverse.svg",
+        "icon-transparent.svg"
+      ],
+      "files": {
+        "myblue-transparent.svg": {
+          "name": "myblue-transparent.svg",
+          "blob": "354c07a1b0e506f0b5e46d1e9fd30a86",
+          "size": 622,
+          "type": "image/svg+xml"
+        },
+        "icon.svg": {
+          "name": "icon.svg",
+          "blob": "d49053a1d9f4b9582abc23ab1556f667",
+          "size": 604,
+          "type": "image/svg+xml"
+        },
+        "icon-inverse.svg": {
+          "name": "icon-inverse.svg",
+          "blob": "dec37e2ef4661c4f4e5a5b78fc71b0f3",
+          "size": 604,
+          "type": "image/svg+xml"
+        },
+        "icon-transparent.svg": {
+          "name": "icon-transparent.svg",
+          "blob": "6c8b4225302ee6d5e848937cb1bfea82",
+          "size": 546,
+          "type": "image/svg+xml"
+        }
+      }
+    },
+    "Legacy": {
+      "name": "Legacy",
+      "tile": "m",
+      "order": [
+        "mb-logo.svg",
+        "myblue-logo.svg"
+      ],
+      "files": {
+        "mb-logo.svg": {
+          "name": "mb-logo.svg",
+          "blob": "b7bd33b79543796e720c707a0d655a68",
+          "size": 460,
+          "type": "image/svg+xml"
+        },
+        "myblue-logo.svg": {
+          "name": "myblue-logo.svg",
+          "blob": "044fcc309f3a3daba03571a8bd2eb074",
+          "size": 652,
+          "type": "image/svg+xml"
+        }
+      }
+    },
+    "Financial": {
+      "name": "Financial",
+      "tile": "m",
+      "order": [
+        "mybluecoin.jpg"
+      ],
+      "files": {
+        "mybluecoin.jpg": {
+          "name": "mybluecoin.jpg",
+          "blob": "a1ed74afa8834387122a83b88941d11a",
+          "size": 15537,
+          "type": "image/jpeg"
+        }
+      }
+    }
+  },
+  "blobs": {},
+  "docs": {
+    "readme": "project/README.md",
+    "sections": []
+  },
+  "lastChange": {
+    "by": "Animesh Sareen",
+    "at": "2026-10-29T23:38:54Z",
+    "via": "Claude Code cloud session",
+    "note": "First build from main@bdf5c48 and codex/brand-kit@beb5286: 106 colors, 30 type styles, 11 components"
+  }
+}
