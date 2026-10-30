@@ -9,7 +9,10 @@
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mybluework.wallet"
+      "bundleIdentifier": "com.mybluework.wallet",
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": ["metamask", "trust", "rainbow", "cbwallet", "phantom", "zerion", "ledgerlive", "wc"]
+      }
     },
     "android": {
       "package": "com.mybluework.wallet",
