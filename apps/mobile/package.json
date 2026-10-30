@@ -21,6 +21,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
+    "scan": "node scripts/scan.mjs",
     "doctor": "npx expo-doctor"
   },
   "private": true

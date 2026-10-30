@@ -122,4 +122,6 @@ Gate: both preview builds start with persistent testnet labeling and reject non-
 
 ## Current implementation checkpoint
 
-`apps/mobile` implements a safe first slice: three accessible tabs, public-address watch mode, live Sepolia balance reads with chain verification, bigint ETH conversion, explicit unavailable activity, and EIP-681 external-wallet handoff. It does not yet claim authenticated wallet connection, indexed history, receipt tracking, or signed preview builds.
+On `main`, `apps/mobile` implements a safe first slice: three accessible tabs, public-address watch mode, live Sepolia balance reads with chain verification, bigint ETH conversion, explicit unavailable activity, and EIP-681 external-wallet handoff. It does not yet claim authenticated wallet connection, indexed history, receipt tracking, or signed preview builds.
+
+In progress: replacing watch-only mode with a Reown AppKit React Native session and refactoring the app into modules around it is being delivered through sibling pull requests. Nothing from that work should be treated as implemented until it is merged. This docs and build-profile change adds setup documentation, a manual test checklist, `eas.json` development and preview profiles (unverified against the Expo 57 docs, which were unreachable when authored), and a policy/secret scan (`npm run scan`). Apple and Google signing remain external requirements, no store submission is configured, and the app is not production ready.
