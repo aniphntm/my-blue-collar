@@ -1,13 +1,14 @@
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useState } from "react";
 import {
-  AccessibilityInfo, ActivityIndicator, Alert, Linking, Modal, Platform,
+  AccessibilityInfo, ActivityIndicator, Alert, Modal, Platform,
   Pressable, ScrollView, StyleSheet, Text, TextInput, View,
 } from "react-native";
 import {
   SEPOLIA, buildSepoliaTransferUri, fetchSepoliaBalance, formatEth,
   isEthereumAddress, shortenAddress,
 } from "./src/ethereum";
+import { SendFlow, SendError, type SendWalletSession } from "./src/send";
 
 type Tab = "Home" | "Activity" | "Wallet";
 type Balance = { kind: "idle" | "loading" } | { kind: "ready"; wei: bigint } | { kind: "error"; message: string };
@@ -62,10 +63,13 @@ export default function App() {
         })}
       </View>
       <ConnectModal open={connectOpen} onClose={() => setConnectOpen(false)} onConnect={connect} />
-      <SendModal balance={balance.kind === "ready" ? balance.wei : null} open={sendOpen} onClose={() => setSendOpen(false)} />
+      <SendFlow session={sendSession(address)} open={sendOpen} onClose={() => setSendOpen(false)} onSettled={() => void refresh()} />
     </View>
   );
 }
+
+// TODO(unit 2): replace with the real `useWalletSession()` value (account, chainId, sendTransaction).
+const sendSession = (account: string): SendWalletSession => ({ account: account || null, chainId: SEPOLIA.chainId, sendTransaction: async () => { throw new SendError("unknown", "No wallet session is connected yet."); } });
 
 function Home({ address, balance, onConnect, onRefresh, onSend }: {
   address: string; balance: Balance; onConnect: () => void; onRefresh: () => void; onSend: () => void;
@@ -102,19 +106,6 @@ function Wallet({ address, onConnect, onDisconnect }: { address: string; onConne
 function ConnectModal({ open, onClose, onConnect }: { open: boolean; onClose: () => void; onConnect: (value: string) => void }) {
   const [value, setValue] = useState("");
   return <Modal animationType="slide" onRequestClose={onClose} presentationStyle="pageSheet" visible={open}><Screen modal><Text style={styles.eyebrow}>WATCH-ONLY CONNECTION</Text><Text style={styles.heading}>Connect wallet</Text><Text style={styles.body}>Paste only your public Ethereum address. Never enter a private key or seed phrase.</Text><Field label="Public address" placeholder="0x…" value={value} onChange={setValue} /><Button label="Connect on Sepolia" onPress={() => onConnect(value)} /><OutlineButton label="Cancel" onPress={onClose} /></Screen></Modal>;
-}
-
-function SendModal({ balance, open, onClose }: { balance: bigint | null; open: boolean; onClose: () => void }) {
-  const [recipient, setRecipient] = useState(""); const [amount, setAmount] = useState("");
-  const send = async () => {
-    if (!isEthereumAddress(recipient.trim())) { Alert.alert("Check the recipient", "Enter a valid public Ethereum address."); return; }
-    try {
-      const uri = buildSepoliaTransferUri(recipient.trim(), amount);
-      if (!(await Linking.canOpenURL(uri))) { Alert.alert("External wallet needed", "Install a wallet that supports Ethereum payment links."); return; }
-      await Linking.openURL(uri); onClose();
-    } catch (error) { Alert.alert("Check the amount", error instanceof Error ? error.message : "Enter a valid ETH amount."); }
-  };
-  return <Modal animationType="slide" onRequestClose={onClose} presentationStyle="pageSheet" visible={open}><Screen modal><Text style={styles.eyebrow}>SEPOLIA TEST TRANSACTION</Text><Text style={styles.heading}>Send test ETH</Text><View style={styles.warning}><Text style={styles.warningText}>Testnet only. Sepolia ETH is not real money.</Text></View><Field label="Recipient public address" placeholder="0x…" value={recipient} onChange={setRecipient} /><Field decimal label="Amount in ETH" placeholder="0.001" value={amount} onChange={setAmount} /><Text style={styles.body}>Available: {balance === null ? "unknown" : `${formatEth(balance)} ETH`}. Your external wallet calculates fees and asks for final approval.</Text><Button label="Continue in external wallet" onPress={() => void send()} /><OutlineButton label="Cancel" onPress={onClose} /></Screen></Modal>;
 }
 
 function Screen({ children, modal = false }: { children: React.ReactNode; modal?: boolean }) { return <ScrollView contentContainerStyle={[styles.screen, modal && styles.modal]} contentInsetAdjustmentBehavior="automatic" keyboardShouldPersistTaps="handled">{children}</ScrollView>; }
