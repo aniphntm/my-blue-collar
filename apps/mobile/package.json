@@ -21,6 +21,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --import ./src/test/register.mjs --test \"src/**/*.test.ts\"",
     "doctor": "npx expo-doctor"
   },
   "private": true
