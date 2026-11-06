@@ -1,0 +1,53 @@
+<!-- @dsCard height=288 -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MyBlue Edge</title>
+<style>
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--c-bg); color: var(--c-text); font-family: var(--font-sans); overflow: hidden; }
+  .cover { position: relative; width: 960px; height: 288px; overflow: hidden; }
+  /* the composition: a 480-wide box on the right half of the 960 layout, clear of the name */
+  .art { position: absolute; top: 0; left: 480px; width: 480px; height: 288px; }
+  .art svg { display: block; width: 480px; height: 288px; }
+  .slab { fill: var(--brand-blue-deep); }
+  .acc { fill: var(--c-accent); }
+  .ink { fill: var(--c-text); }
+  .tint { fill: var(--c-mark); }
+  .lite { fill: var(--brand-blue-light); }
+  .blk { rx: var(--radius-card); }
+  .cut { stroke: var(--c-bg); stroke-width: 2; fill: none; }
+  .words { position: absolute; left: var(--space-6); bottom: var(--space-6); max-width: 440px; }
+  .name { margin: 0; font-size: 104px; line-height: .95; font-weight: 500; letter-spacing: -.022em; color: var(--c-text); }
+  .tag { margin: var(--space-2) 0 0 4px; font-size: 14px; line-height: 20px; color: var(--c-text-mut); }
+</style>
+</head>
+<body>
+<div class="cover">
+<div class="art" aria-hidden="true">
+<svg viewBox="480 0 480 288" width="480" height="288">
+<!--
+  blocks      brand-blue-deep 136x216 bled off the top (the logo's deep end, largest) · c-accent 136x128 · c-text ink 168x168 bled off the right · c-mark 280x64 tint for relief · brand-blue-light 64x64 once, the logo's light end; about a third of the 960x288 cover
+  arrangement three upper blocks bottom-aligned on y=192 in a staggered stack of rising heights, a tint strip and one small square below them, bottoms on y=264 (space-6 above the edge), space-2 gutters
+  pattern     "borders not shadows, a graph-paper wash" -> four 2px ground-colour hairlines cut through the blocks at the 64px paper-grid pitch (grid-pitch): three verticals every 128px, one horizontal at y=128
+  scales      sides in space-2 multiples; gutters space-2; rules at grid-pitch multiples; corners radius-card (8px); the name sits in the left half, nothing crosses x=480
+-->
+<rect class="slab blk" x="512" y="-24" width="136" height="216" rx="8"/>
+<rect class="acc blk" x="656" y="64" width="136" height="128" rx="8"/>
+<rect class="ink blk" x="800" y="24" width="168" height="168" rx="8"/>
+<rect class="tint blk" x="512" y="200" width="280" height="64" rx="8"/>
+<rect class="lite blk" x="800" y="200" width="64" height="64" rx="8"/>
+<line class="cut" x1="608" y1="0" x2="608" y2="192"/>
+<line class="cut" x1="736" y1="0" x2="736" y2="264"/>
+<line class="cut" x1="864" y1="0" x2="864" y2="192"/>
+<line class="cut" x1="480" y1="128" x2="968" y2="128"/>
+</svg>
+</div>
+<div class="words">
+<h1 class="name">MyBlue<br>Edge</h1>
+<p class="tag">One system for every MyBlue channel.</p>
+</div>
+</div>
+</body>
+</html>

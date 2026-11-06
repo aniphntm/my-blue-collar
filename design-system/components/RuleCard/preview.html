@@ -1,0 +1,20 @@
+<!-- @dsCard group="Cards" height=330 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>RuleCard - preview</title></head>
+<body>
+<div id="root" class="mb-stage"></div>
+<script>
+  var M = window.MyBlue, h = React.createElement;
+
+  var app = h(M.RuleGrid, null,
+    h(M.RuleCard, { eyebrow: 'FREE \u00b7 NOT A TRIAL', title: 'Free stays free', rule: 'RULE \u2192 the essentials never go behind a paywall' },
+      'Scheduling, customers, estimates, invoicing. No trial clock, no card on file, no feature you lose on day thirty.'),
+    h(M.RuleCard, { eyebrow: 'ONE THREAD \u00b7 PER JOB', title: 'Nothing falls through', rule: 'RULE \u2192 one job, one thread, start to paid' },
+      'Every call, text, photo, estimate, and invoice stays with the job, in order. The thread is the record.'),
+    h(M.RuleCard, { eyebrow: 'YOURS \u00b7 NOT OURS', title: 'Your customers are yours', rule: 'RULE \u2192 your book of business leaves when you do' },
+      'Your list, your history, your relationships. Export it any day you like. We don\u2019t rent your customers back to you.'));
+  ReactDOM.createRoot(document.getElementById('root')).render(app);
+</script>
+</body>
+</html>

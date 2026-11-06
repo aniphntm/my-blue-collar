@@ -1,0 +1,21 @@
+<!-- @dsCard group="Actions" height=150 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Button - preview</title></head>
+<body>
+<div id="root" class="mb-stage"></div>
+<script>
+  var M = window.MyBlue, h = React.createElement;
+
+  var app = h('div', { className: 'mb-stack' },
+    h('div', { className: 'mb-row' },
+      h(M.Button, { arrow: true }, 'Join'),
+      h(M.Button, { variant: 'secondary', arrow: true }, 'Join'),
+      h(M.Button, { variant: 'text', arrow: true }, 'Your page'),
+      h(M.Button, { variant: 'text', tone: 'accent', arrow: true }, 'Start free'),
+      h(M.Button, { disabled: true }, 'Sending\u2026')),
+    h('div', { style: { maxWidth: 360 } }, h(M.Button, { block: true, type: 'submit' }, 'Join the waitlist \u2192')));
+  ReactDOM.createRoot(document.getElementById('root')).render(app);
+</script>
+</body>
+</html>

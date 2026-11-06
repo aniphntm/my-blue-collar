@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 151 64" role="img" aria-label="myblue">
+<defs><linearGradient id="blue" x1="8" y1="4" x2="143" y2="60" gradientUnits="userSpaceOnUse"><stop stop-color="#3B82F6"/><stop offset="1" stop-color="#1D4ED8"/></linearGradient></defs>
+<path d="M10 45V29m0 5c2-7 11-7 11 1v10m0-10c1-8 12-8 12 0v10
+M43 29l7 16m8-16L48 54
+M69 18v27m0-10c2-8 13-8 13 2v1c0 10-13 10-13 1
+M92 18v27
+M102 29v9c0 10 14 10 14 0m0-9v16
+M127 37h14c0-11-14-11-14 0v1c0 8 8 10 13 5"
+fill="none" stroke="url(#blue)" stroke-linecap="round" stroke-linejoin="round" stroke-width="5.5"/>
+</svg>

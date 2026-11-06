@@ -1,0 +1,20 @@
+<!-- @dsCard group="Disclosure" height=300 -->
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>FaqItem - preview</title></head>
+<body>
+<div id="root" class="mb-stage"></div>
+<script>
+  var M = window.MyBlue, h = React.createElement;
+
+  var app = h('div', { style: { borderTop: '1px solid var(--c-border)' } },
+    h(M.FaqItem, { question: 'Is it really free?', defaultOpen: true },
+      'Yes. Scheduling, customers, invoicing, and growth tools \u2014 free. No trial, no card on file. Paid tiers add advanced features later; the essentials stay where they are.'),
+    h(M.FaqItem, { question: 'Can I keep my CRM?' },
+      'Yes. Sync with Google Contacts, Google Sheets, QuickBooks, Jobber, or Housecall Pro \u2014 or use ours if you\u2019re starting fresh.'),
+    h(M.FaqItem, { question: 'When do the paid plans land?' },
+      'Pro and Network open after the beta. Beta members get first access and preferred pricing.'));
+  ReactDOM.createRoot(document.getElementById('root')).render(app);
+</script>
+</body>
+</html>
