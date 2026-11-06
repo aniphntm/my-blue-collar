@@ -1,0 +1,6 @@
+{
+  "name": "myblue-finance-design-review",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "node preview.mjs" }
+}
