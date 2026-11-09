@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [{
+      source: "/:path((?!api/webhooks$).*)",
+      has: [{ type: "host", value: "mybluework.com" }],
+      destination: "https://www.mybluework.com/:path",
+      permanent: true,
+    }];
+  },
   async rewrites() {
     return {
       beforeFiles: [
